@@ -1,92 +1,134 @@
--- Remote Spy Tool with Clipboard Copy
--- Monitors RemoteEvent and RemoteFunction calls, and provides an option to copy details.
+-- OrionLib Integration for Gabe&Snicks BOA Cult
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalPlayer = Players.LocalPlayer
+local Window = OrionLib:MakeWindow({
+    Name = "Gabe&Snicks BOA Cult",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "OrionConfig"
+})
 
--- Create GUI
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "RemoteSpyGUI"
-screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+-- Load Scripts
+local gabeBoa = loadstring(game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/GabeBOA2.lua"))()
+local BoaTeleports = loadstring(game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/TeleportPlaces.lua"))()
+local InfiniteYield = loadstring(game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/InfiniteYield.lua"))()
+local Powers = loadstring(game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/Powers.lua"))()
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0.4, 0, 0.6, 0)
-frame.Position = UDim2.new(0.3, 0, 0.2, 0)
-frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-frame.Parent = screenGui
+-- Auto-Farming Tab
+local farmingTab = Window:MakeTab({
+    Name = "Gabe Boa Farming",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, 0, 0.1, 0)
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextScaled = true
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Remote Spy Tool"
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.Parent = frame
-
-local scrollingFrame = Instance.new("ScrollingFrame")
-scrollingFrame.Size = UDim2.new(1, 0, 0.8, 0)
-scrollingFrame.Position = UDim2.new(0, 0, 0.1, 0)
-scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-scrollingFrame.ScrollBarThickness = 8
-scrollingFrame.Parent = frame
-
-local uiListLayout = Instance.new("UIListLayout")
-uiListLayout.Parent = scrollingFrame
-
-local copyButton = Instance.new("TextButton")
-copyButton.Size = UDim2.new(1, 0, 0.1, 0)
-copyButton.Position = UDim2.new(0, 0, 0.9, 0)
-copyButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-copyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-copyButton.TextScaled = true
-copyButton.Text = "Copy Last Remote Info"
-copyButton.Font = Enum.Font.SourceSansBold
-copyButton.Parent = frame
-
-local lastRemoteData = ""
-
--- Function to log remote calls
-local function logRemote(remoteType, remote, args)
-    local textLabel = Instance.new("TextLabel")
-    textLabel.Size = UDim2.new(1, -10, 0, 30)
-    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    textLabel.TextScaled = true
-    textLabel.BackgroundTransparency = 1
-    textLabel.Text = string.format("[%s] %s - Args: %s", remoteType, remote:GetFullName(), tostring(args))
-    textLabel.Parent = scrollingFrame
-
-    -- Save last remote data for copying
-    lastRemoteData = string.format("Remote Type: %s\nRemote Path: %s\nArguments: %s", remoteType, remote:GetFullName(), tostring(args))
-
-    -- Update canvas size
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, #scrollingFrame:GetChildren() * 30)
-end
-
--- Monitor all remote calls
-for _, remote in ipairs(ReplicatedStorage:GetDescendants()) do
-    if remote:IsA("RemoteEvent") then
-        remote.OnClientEvent:Connect(function(...)
-            logRemote("RemoteEvent", remote, {...})
-        end)
-    elseif remote:IsA("RemoteFunction") then
-        local originalInvoke = remote.InvokeServer
-        remote.InvokeServer = function(_, ...)
-            logRemote("RemoteFunction", remote, {...})
-            return originalInvoke(remote, ...)
+farmingTab:AddToggle({
+    Name = "Enable Auto-BOA Farming",
+    Default = false,
+    Callback = function(value)
+        if value then
+            gabeBoa.enableFarming()
+        else
+            gabeBoa.disableFarming()
         end
     end
-end
+})
 
--- Copy last remote data to clipboard
-copyButton.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(lastRemoteData)
-        print("Copied to clipboard: " .. lastRemoteData)
-    else
-        print("Clipboard copying is not supported.")
+-- Boa Teleports Tab
+local teleportTab = Window:MakeTab({
+    Name = "Boa Teleports",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+teleportTab:AddButton({
+    Name = "Powerstone BOA",
+    Callback = function()
+        BoaTeleports.teleportTo("Powerstone BOA")
     end
-end)
+})
 
-print("Remote Spy Tool initialized!")
+teleportTab:AddButton({
+    Name = "Arena BOA",
+    Callback = function()
+        BoaTeleports.teleportTo("Arena BOA")
+    end
+})
+
+teleportTab:AddButton({
+    Name = "BOA By The Beach",
+    Callback = function()
+        BoaTeleports.teleportTo("BOA By The Beach")
+    end
+})
+
+teleportTab:AddButton({
+    Name = "Gabe’s Got Candy",
+    Callback = function()
+        BoaTeleports.teleportTo("Gabe’s Got Candy")
+    end
+})
+
+teleportTab:AddButton({
+    Name = "Back Of The Bus Gabe",
+    Callback = function()
+        BoaTeleports.teleportTo("Back Of The Bus Gabe")
+    end
+})
+
+teleportTab:AddButton({
+    Name = "Gabe on Display",
+    Callback = function()
+        BoaTeleports.teleportTo("Gabe on Display")
+    end
+})
+
+teleportTab:AddButton({
+    Name = "Idk Found White Visions Cape",
+    Callback = function()
+        BoaTeleports.teleportTo("Idk Found White Visions Cape")
+    end
+})
+
+teleportTab:AddButton({
+    Name = "Inside Omega Building",
+    Callback = function()
+        BoaTeleports.teleportTo("Inside Omega Building")
+    end
+})
+
+teleportTab:AddButton({
+    Name = "BOA Urself Up",
+    Callback = function()
+        BoaTeleports.teleportTo("BOA Urself Up")
+    end
+})
+
+-- Powers Tab
+local powersTab = Window:MakeTab({
+    Name = "Powers",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+powersTab:AddButton({
+    Name = "Woman's Mace",
+    Callback = function()
+        Powers.womansMace()
+    end
+})
+
+-- Infinite Yield Tab
+local adminTab = Window:MakeTab({
+    Name = "Infinite Yield",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+adminTab:AddButton({
+    Name = "BOA Admin",
+    Callback = function()
+        InfiniteYield.load()
+    end
+})
+
+OrionLib:Init()
