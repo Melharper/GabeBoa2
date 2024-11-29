@@ -1,31 +1,18 @@
--- Ultra-Secure EncoderLoader Script
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Whitelist of authorized User IDs
-local authorizedUserIds = {
-    77012180,     -- Your User ID
-    2380634727    -- Another User ID
-}
-
--- Function to check if a user is whitelisted
-local function isWhitelisted(userId)
-    for _, id in ipairs(authorizedUserIds) do
-        if userId == id then
-            return true
-        end
-    end
-    return false
-end
-
--- Auto-kick if user is not whitelisted
-if not isWhitelisted(LocalPlayer.UserId) then
+-- Whitelist
+local authorizedUserIds = { 77012180, 2380634727 }
+if not table.find(authorizedUserIds, LocalPlayer.UserId) then
     LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
     return
 end
 
--- Custom Base64 Decoder
+-- Debug: Whitelist check
+print("Player is whitelisted:", LocalPlayer.UserId)
+
+-- Base64 Decoder
 local function Base64Decode(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')
@@ -42,58 +29,20 @@ local function Base64Decode(data)
     end))
 end
 
--- Multi-layered encoded URLs
+-- Encoded Layers
 local encodedUrls = {
-    -- 1st Layer
-    "WVhWMGNuVnVZMlZ5TFhKbGMyVnllQzl0YldWd...",
-    -- 2nd Layer
-    "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYX...",
-    -- 3rd Layer
-    "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYX...",
-    -- Add more layers up to 300 lines
+    "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 }
 
--- Function to decode all layers
-local function decodeLayers(layers)
-    local decoded = Base64Decode(layers[1])
-    for i = 2, #layers do
-        decoded = Base64Decode(decoded)
-        assert(decoded == Base64Decode(layers[i]), "Validation failed: URL mismatch in layer " .. i)
-    end
-    return decoded
-end
+-- Decode
+local decodedUrl = Base64Decode(encodedUrls[1])
+print("Decoded URL:", decodedUrl)
 
--- Decoding the final URL
-local decodedUrl = decodeLayers(encodedUrls)
-
--- Additional Hash Validation for Decoded URL
-local function validateHash(decodedData)
-    local expectedHash = "simulated-hash-placeholder" -- Replace with a proper hash
-    local actualHash = HttpService:GenerateGUID(false) -- Simulated hash (replace with MD5/SHA256 for real protection)
-    assert(expectedHash == actualHash, "Hash mismatch detected! Script execution halted.")
-end
-
-validateHash(decodedUrl)
-
--- Environment Validation
-local function validateEnvironment()
-    assert(game and game:GetService("HttpService"), "Environment validation failed.")
-    assert(HttpService:JSONDecode("[]"), "Environment validation failed: JSONDecode malfunctioning.")
-end
-
-validateEnvironment()
-
--- Safeguard: Disable Developer Console
-pcall(function()
-    game:GetService("StarterGui"):SetCore("DevConsoleVisible", false)
-end)
-
--- Final Script Execution
+-- Execute
 local success, err = pcall(function()
     loadstring(game:HttpGet(decodedUrl))()
 end)
 
 if not success then
-    warn("Execution failed: " .. tostring(err))
-    error("Script execution aborted.")
+    warn("Error executing script:", err)
 end
