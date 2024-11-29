@@ -11,7 +11,7 @@ local function toggleGabeBoa()
     end
 end
 
--- Function to create a Scarlet Witch-themed GUI button
+-- Function to create Scarlet Witch-themed GUI button with animations
 local function createToggleButton()
     local Players = game:GetService("Players")
     local LocalPlayer = Players.LocalPlayer
@@ -28,14 +28,12 @@ local function createToggleButton()
     button.Size = UDim2.new(0, 200, 0, 50)
     button.Position = UDim2.new(1, -220, 0.5, -25)
     button.BackgroundColor3 = Color3.fromRGB(128, 0, 0) -- Scarlet red
-    button.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-    button.Font = Enum.Font.Fantasy -- Magical font style
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.Fantasy
     button.TextSize = 18
-    button.BorderSizePixel = 2
-    button.BorderColor3 = Color3.fromRGB(255, 69, 69) -- Glowing red border
     button.Parent = screenGui
 
-    -- Glow effect
+    -- Add animations to the button
     local uiGradient = Instance.new("UIGradient")
     uiGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
@@ -43,7 +41,14 @@ local function createToggleButton()
     })
     uiGradient.Parent = button
 
-    -- Add drag functionality to the button
+    -- Toggle functionality when button is clicked
+    button.MouseButton1Click:Connect(function()
+        toggleGabeBoa()
+        button.Text = isGabeBoaEnabled and "Disable Gabe Boa" or "Enable Gabe Boa"
+        button.BackgroundColor3 = isGabeBoaEnabled and Color3.fromRGB(128, 0, 0) or Color3.fromRGB(64, 0, 0)
+    end)
+
+    -- Add drag functionality
     local dragging = false
     local dragInput, dragStart, startPos
 
@@ -73,37 +78,26 @@ local function createToggleButton()
             button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
-
-    -- Toggle functionality when button is clicked
-    button.MouseButton1Click:Connect(function()
-        toggleGabeBoa()
-        button.Text = isGabeBoaEnabled and "Disable Gabe Boa" or "Enable Gabe Boa"
-        button.BackgroundColor3 = isGabeBoaEnabled and Color3.fromRGB(128, 0, 0) or Color3.fromRGB(64, 0, 0) -- Lighter red when enabled, darker when disabled
-    end)
 end
 
 -- Create the toggle button
 createToggleButton()
 
--- Function to play sound
-local function playSound()
+-- Play "Gabe is So Boa" animation upon execution
+local function playGabeBoaAnimation()
     local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://2820356263" -- Replace with your sound asset ID
-    sound.Looped = true
-    sound.Volume = 10 -- Adjust volume
+    sound.SoundId = "rbxassetid://1234567890" -- Replace with "Gabe is so boa" sound asset ID
+    sound.Volume = 5
     sound.Parent = game.Workspace
     sound:Play()
-    return sound
 end
-
--- Start playing music and keep reference
-local music = playSound()
+playGabeBoaAnimation()
 
 -- Function to spawn character
 local function spawnCharacter()
     local args = {
         [1] = "RequestCharacter",
-        [2] = "InvisibleWoman", -- Replace with desired character
+        [2] = "InvisibleWoman", -- Replace with your desired character
         [3] = "Default"
     }
 
@@ -118,18 +112,22 @@ local function spawnCharacter()
     end
 end
 
--- Anti-idle function to simulate activity
-local function antiIdle()
-    local VirtualInputManager = game:GetService("VirtualInputManager")
-    while true do
+-- Automatic respawn function
+local function monitorRespawn()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+
+    LocalPlayer.CharacterAdded:Connect(function()
+        print("[INFO] Character respawned.")
         if isGabeBoaEnabled then
-            VirtualInputManager:SendMouseMovement(Vector2.new(0, 0), 0.1)
+            spawnCharacter()
         end
-        wait(30) -- Every 30 seconds
-    end
+    end)
 end
 
--- Main loop to teleport and interact with chests
+monitorRespawn()
+
+-- Main farming loop
 spawn(function()
     local Players = game:GetService("Players")
     local LocalPlayer = Players.LocalPlayer
@@ -163,17 +161,8 @@ spawn(function()
                 print("[INFO] Chest not found. Waiting for new chest.")
             end
         else
-            -- Stop music when disabled
-            if music.IsPlaying then
-                music:Stop()
-            end
+            wait(1) -- Small delay when disabled
         end
         wait(1)
     end
 end)
-
--- Run anti-idle in a separate thread
-spawn(antiIdle)
-
--- Spawn character on game start
-spawnCharacter()
