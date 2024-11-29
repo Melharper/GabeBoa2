@@ -64,7 +64,8 @@ local function farmChests()
     local function teleportToChest()
         local chest = Workspace:FindFirstChild("Chest")
         if chest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
+            -- Handle chest CFrame, fallback if "Body" is missing
+            LocalPlayer.Character.HumanoidRootPart.CFrame = chest:FindFirstChild("Body") and chest.Body.CFrame or chest.CFrame
             setCameraPosition()  -- Correct the camera after teleport
         end
     end
@@ -72,7 +73,7 @@ local function farmChests()
     local function interactWithChest()
         local chest = Workspace:FindFirstChild("Chest")
         if chest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local chestPos = chest.Body.CFrame.Position
+            local chestPos = chest:FindFirstChild("Body") and chest.Body.CFrame.Position or chest.CFrame.Position
             local playerPos = LocalPlayer.Character.HumanoidRootPart.Position
 
             if (chestPos - playerPos).Magnitude <= 10 then
@@ -127,7 +128,6 @@ end
 
 -- Function to respawn character
 local function autoRespawnCharacter()
-    -- Ensure that respawning only happens if auto-farming is enabled
     if autoFarmingEnabled then
         game.Players.LocalPlayer.CharacterRemoving:Connect(function()
             wait(5)
