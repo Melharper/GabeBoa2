@@ -1,3 +1,34 @@
+-- Whitelist URL
+local whitelistUrl = "https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/whitelist.json"
+
+-- Services
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+-- Fetch whitelist
+local success, data = pcall(function()
+    return HttpService:JSONDecode(game:HttpGet(whitelistUrl))
+end)
+
+if not success or not data or not data.whitelist then
+    error("Failed to fetch whitelist. Please try again later.")
+end
+
+-- Check if user is whitelisted
+local isWhitelisted = false
+for _, userId in ipairs(data.whitelist) do
+    if localPlayer.UserId == userId then
+        isWhitelisted = true
+        break
+    end
+end
+
+if not isWhitelisted then
+    localPlayer:Kick("NotWhiteListed: You're not BOA..")
+    return
+end
+
 -- OrionLib Integration for Gabe&Snicks BOA Cult
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
@@ -40,68 +71,26 @@ local teleportTab = Window:MakeTab({
     PremiumOnly = false
 })
 
-teleportTab:AddButton({
-    Name = "Powerstone BOA",
-    Callback = function()
-        BoaTeleports.teleportTo("Powerstone BOA")
-    end
-})
+local teleportLocations = {
+    "Powerstone BOA",
+    "Arena BOA",
+    "BOA By The Beach",
+    "Gabe’s Got Candy",
+    "Back Of The Bus Gabe",
+    "Gabe on Display",
+    "Idk Found White Visions Cape",
+    "Inside Omega Building",
+    "BOA Urself Up"
+}
 
-teleportTab:AddButton({
-    Name = "Arena BOA",
-    Callback = function()
-        BoaTeleports.teleportTo("Arena BOA")
-    end
-})
-
-teleportTab:AddButton({
-    Name = "BOA By The Beach",
-    Callback = function()
-        BoaTeleports.teleportTo("BOA By The Beach")
-    end
-})
-
-teleportTab:AddButton({
-    Name = "Gabe’s Got Candy",
-    Callback = function()
-        BoaTeleports.teleportTo("Gabe’s Got Candy")
-    end
-})
-
-teleportTab:AddButton({
-    Name = "Back Of The Bus Gabe",
-    Callback = function()
-        BoaTeleports.teleportTo("Back Of The Bus Gabe")
-    end
-})
-
-teleportTab:AddButton({
-    Name = "Gabe on Display",
-    Callback = function()
-        BoaTeleports.teleportTo("Gabe on Display")
-    end
-})
-
-teleportTab:AddButton({
-    Name = "Idk Found White Visions Cape",
-    Callback = function()
-        BoaTeleports.teleportTo("Idk Found White Visions Cape")
-    end
-})
-
-teleportTab:AddButton({
-    Name = "Inside Omega Building",
-    Callback = function()
-        BoaTeleports.teleportTo("Inside Omega Building")
-    end
-})
-
-teleportTab:AddButton({
-    Name = "BOA Urself Up",
-    Callback = function()
-        BoaTeleports.teleportTo("BOA Urself Up")
-    end
-})
+for _, location in ipairs(teleportLocations) do
+    teleportTab:AddButton({
+        Name = location,
+        Callback = function()
+            BoaTeleports.teleportTo(location)
+        end
+    })
+end
 
 -- Powers Tab
 local powersTab = Window:MakeTab({
@@ -131,4 +120,5 @@ adminTab:AddButton({
     end
 })
 
+-- Initialize OrionLib
 OrionLib:Init()
