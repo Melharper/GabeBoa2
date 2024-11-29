@@ -21,6 +21,9 @@ function BoaTeleports.teleportTo(locationName)
     local Players = game:GetService("Players")
     local LocalPlayer = Players.LocalPlayer
 
+    -- Safeguard CoreGui
+    game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
+
     if teleportLocations[locationName] then
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(teleportLocations[locationName])
