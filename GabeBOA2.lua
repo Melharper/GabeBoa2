@@ -58,17 +58,18 @@ end
 
 -- Auto-respawn the character after death
 local function autoRespawnCharacter()
+    -- Monitor when the character is removed
     game.Players.LocalPlayer.CharacterRemoving:Connect(function()
         if autoFarmingEnabled then
-            wait(5) -- Delay before respawning
-            selectAndSpawnCharacter()
+            wait(5) -- Delay before attempting to respawn
+            selectAndSpawnCharacter() -- Spawn the character
         end
     end)
 
     -- Restart farming and GUI after respawn
     game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
         if autoFarmingEnabled then
-            wait(1) -- Wait for character to load fully
+            wait(1) -- Ensure character is fully loaded
             setCameraPosition()
             createAndShowGUI()
             startAntiAfk()
@@ -85,9 +86,18 @@ local function selectAndSpawnCharacter()
         [3] = "Default"
     }
 
-    pcall(function()
-        game:GetService("ReplicatedStorage"):WaitForChild("ClientModules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
-    end)
+    -- Retry logic in case of failure
+    for i = 1, 3 do
+        local success = pcall(function()
+            game:GetService("ReplicatedStorage"):WaitForChild("ClientModules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+        end)
+
+        if success then
+            break
+        else
+            wait(2) -- Retry after a short delay
+        end
+    end
 end
 
 -- Function to teleport to and interact with chests
