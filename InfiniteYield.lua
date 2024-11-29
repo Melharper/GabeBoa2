@@ -3,6 +3,10 @@
 
 local InfiniteYield = {}
 
+-- Ensure CoreGui is enabled
+local StarterGui = game:GetService("StarterGui")
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
+
 -- Function to load Infinite Yield
 function InfiniteYield.load()
     local success, err = pcall(function()
@@ -13,6 +17,9 @@ function InfiniteYield.load()
     else
         warn("Failed to load Infinite Yield: " .. tostring(err))
     end
+
+    -- Safeguard CoreGui after loading Infinite Yield
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
 end
 
 return InfiniteYield
