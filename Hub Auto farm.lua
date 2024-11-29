@@ -1,4 +1,3 @@
--- Module for Auto-Farming
 local AutoFarm = {}
 
 -- Variables to manage the toggle state
@@ -66,6 +65,7 @@ local function farmChests()
         local chest = Workspace:FindFirstChild("Chest")
         if chest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
+            setCameraPosition()  -- Correct the camera after teleport
         end
     end
 
@@ -127,13 +127,14 @@ end
 
 -- Function to respawn character
 local function autoRespawnCharacter()
-    game.Players.LocalPlayer.CharacterRemoving:Connect(function()
-        if autoFarmingEnabled then
+    -- Ensure that respawning only happens if auto-farming is enabled
+    if autoFarmingEnabled then
+        game.Players.LocalPlayer.CharacterRemoving:Connect(function()
             wait(5)
             selectAndSpawnCharacter()
             setCameraPosition() -- Correct camera after respawn
-        end
-    end)
+        end)
+    end
 end
 
 -- Function to clean up custom resources
@@ -156,6 +157,9 @@ function AutoFarm.cleanup()
         end
     end
     customSounds = {}
+
+    -- Stop respawn function when auto-farming is disabled
+    game.Players.LocalPlayer.CharacterRemoving:Disconnect()
 end
 
 -- Function to start auto-farming
