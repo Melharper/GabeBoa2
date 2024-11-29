@@ -1,182 +1,110 @@
--- Services
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local LocalPlayer = Players.LocalPlayer
-local Camera = Workspace.CurrentCamera
+-- Gabe Boa Auto-Farming Script
+-- Description: Auto-farming features with teleport functionality and other utilities.
 
--- State Control
-local isGabeBoaEnabled = true
-local music
-local chestCooldown = false -- Prevent interaction spamming
+-- Variables to manage the toggle state
+local autoFarmingEnabled = false
+local customGUIs = {} -- Track custom GUI objects for cleanup
+local customSounds = {} -- Track custom sound objects for cleanup
 
--- Toggle Gabe Boa's functionality
-local function toggleGabeBoa()
-    isGabeBoaEnabled = not isGabeBoaEnabled
-    print(isGabeBoaEnabled and "[INFO] Gabe Boa Enabled" or "[INFO] Gabe Boa Disabled")
-    if music then
-        if isGabeBoaEnabled then
-            music:Play()
-        else
-            music:Stop()
-        end
-    end
-end
+-- Function to create and show GUI
+local function createAndShowGUI()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "GabeBoaGUI" -- Name to identify later for cleanup
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    table.insert(customGUIs, screenGui)
 
--- Scarlet Witch-themed GUI
-local function createToggleButton()
-    if LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("GabeBoaToggleGUI") then
-        return
+    for i = 0, 10 do
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Text = "Gabe is so BOAAAA"
+        textLabel.Size = UDim2.new(1, 0, 0.1, 0)
+        textLabel.Position = UDim2.new(0, 0, 0.1 * i, 0)
+        textLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+        textLabel.TextSize = 50
+        textLabel.BackgroundTransparency = 1
+        textLabel.TextStrokeTransparency = 0.5
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.Parent = screenGui
     end
 
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "GabeBoaToggleGUI"
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-    local button = Instance.new("TextButton")
-    button.Name = "ToggleGabeBoaButton"
-    button.Text = "Disable Gabe Boa"
-    button.Size = UDim2.new(0, 200, 0, 50)
-    button.Position = UDim2.new(1, -220, 0.5, -25)
-    button.BackgroundColor3 = Color3.fromRGB(128, 0, 0)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.Fantasy
-    button.TextSize = 18
-    button.Parent = screenGui
-
-    -- Toggle Functionality
-    button.MouseButton1Click:Connect(function()
-        toggleGabeBoa()
-        button.Text = isGabeBoaEnabled and "Disable Gabe Boa" or "Enable Gabe Boa"
-        button.BackgroundColor3 = isGabeBoaEnabled and Color3.fromRGB(128, 0, 0) or Color3.fromRGB(64, 0, 0)
-    end)
-end
-
--- Display "Gabe is So BOAAA" Animation
-local function displayGabeBoaText()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "GabeBoaTextGUI"
-    screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
-    local textLabel = Instance.new("TextLabel")
-    textLabel.Text = "GABE IS SO BOAAA"
-    textLabel.Font = Enum.Font.Arcade
-    textLabel.TextSize = 50
-    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    textLabel.BackgroundTransparency = 1
-    textLabel.Size = UDim2.new(1, 0, 1, 0)
-    textLabel.TextStrokeTransparency = 0
-    textLabel.TextStrokeColor3 = Color3.fromRGB(128, 0, 0)
-    textLabel.Parent = screenGui
-
-    game:GetService("TweenService"):Create(
-        textLabel,
-        TweenInfo.new(2),
-        { TextTransparency = 1 }
-    ):Play()
-    wait(2)
+    wait(3)
     screenGui:Destroy()
 end
 
--- Background Music
-local function playMusic()
-    music = Instance.new("Sound")
-    music.SoundId = "rbxassetid://2820356263"
-    music.Looped = true
-    music.Volume = 5
-    music.Parent = Workspace
-    if isGabeBoaEnabled then
-        music:Play()
-    end
+-- Function to play sound
+local function playSound()
+    local sound = Instance.new("Sound")
+    sound.Name = "GabeBoaSound" -- Name to identify later for cleanup
+    sound.SoundId = "rbxassetid://2820356263"
+    sound.Parent = game.Workspace
+    sound.Looped = true
+    sound.Volume = 10
+    sound:Play()
+    table.insert(customSounds, sound)
 end
 
--- Adjust Camera
-local function adjustCamera()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 10, 0)
-        local targetPosition = LocalPlayer.Character.HumanoidRootPart.Position
-        Camera.CFrame = CFrame.new(position, targetPosition)
-        Camera.FieldOfView = 70
-        Camera.CameraType = Enum.CameraType.Custom
-        print("[INFO] Camera adjusted.")
-    end
-end
-
--- Spawn Character
-local function spawnCharacter()
+-- Function to select and spawn the character
+local function selectAndSpawnCharacter()
     local args = {
         [1] = "RequestCharacter",
-        [2] = "InvisibleWoman", -- Replace with your desired character
+        [2] = "InvisibleWoman",
         [3] = "Default"
     }
-    ReplicatedStorage:WaitForChild("ClientModules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
-    print("[INFO] Character spawned.")
+
+    pcall(function()
+        game:GetService("ReplicatedStorage"):WaitForChild("ClientModules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+    end)
 end
 
--- Respawn Character and Adjust Camera
-LocalPlayer.CharacterAdded:Connect(function()
-    print("[INFO] Character respawned.")
-    if isGabeBoaEnabled then
-        wait(1) -- Ensure character fully loads
-        adjustCamera() -- Adjust camera after respawn
+-- Function to teleport to a specific location
+local function teleportToLocation(location)
+    local player = game.Players.LocalPlayer
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = player.Character.HumanoidRootPart
+        humanoidRootPart.CFrame = location.CFrame
     end
-end)
-
-LocalPlayer.CharacterRemoving:Connect(function()
-    print("[INFO] Character died. Respawning...")
-    if isGabeBoaEnabled then
-        wait(5) -- Wait for respawn process
-        spawnCharacter()
-    end
-end)
-
--- Periodic Death Check (every 15 minutes)
-spawn(function()
-    while true do
-        if not LocalPlayer.Character and isGabeBoaEnabled then
-            print("[INFO] Player is dead. Respawning...")
-            spawnCharacter()
-        end
-        wait(900) -- Wait for 15 minutes before checking again
-    end
-end)
-
--- Chest Farming Functionality
-spawn(function()
-    while true do
-        if isGabeBoaEnabled and not chestCooldown and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local chest = Workspace:FindFirstChild("Chest")
-            if chest then
-                chestCooldown = true
-                -- Teleport to chest
-                LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
-                print("[INFO] Teleported to chest.")
-                adjustCamera() -- Adjust camera after teleport
-                wait(1)
-                -- Interact with chest
-                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
-                wait(3) -- Give time for interaction
-                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
-                print("[INFO] Interacted with chest.")
-                wait(5) -- Cooldown before next interaction
-                chestCooldown = false
-            else
-                print("[INFO] Chest not found. Waiting...")
-            end
-        end
-        wait(1)
-    end
-end)
-
--- Execution
-createToggleButton()
-displayGabeBoaText()
-playMusic()
-
--- On first enable, ensure spawn
-if not LocalPlayer.Character then
-    spawnCharacter() -- Force spawn if character is missing
-    adjustCamera() -- Adjust camera
 end
+
+-- Function to clean up custom resources
+local function cleanup()
+    autoFarmingEnabled = false
+
+    -- Remove custom GUI elements
+    for _, gui in ipairs(customGUIs) do
+        if gui and gui.Parent then
+            gui:Destroy()
+        end
+    end
+    customGUIs = {}
+
+    -- Stop and remove custom sounds
+    for _, sound in ipairs(customSounds) do
+        if sound and sound.Parent then
+            sound:Stop()
+            sound:Destroy()
+        end
+    end
+    customSounds = {}
+end
+
+-- Add functions to enable farming
+return {
+    enableFarming = function()
+        autoFarmingEnabled = true
+        createAndShowGUI()
+        playSound()
+        selectAndSpawnCharacter()
+    end,
+
+    disableFarming = function()
+        cleanup()
+    end,
+
+    teleportToPowerstone = function()
+        local powerStone = game.Workspace:FindFirstChild("PowerStone")
+        if powerStone then
+            teleportToLocation(powerStone)
+        else
+            warn("PowerStone not found in the workspace.")
+        end
+    end
+}
