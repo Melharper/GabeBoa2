@@ -11,7 +11,7 @@ local function toggleGabeBoa()
     end
 end
 
--- Function to create a draggable GUI button
+-- Function to create a Scarlet Witch-themed GUI button
 local function createToggleButton()
     local Players = game:GetService("Players")
     local LocalPlayer = Players.LocalPlayer
@@ -25,13 +25,23 @@ local function createToggleButton()
     local button = Instance.new("TextButton")
     button.Name = "ToggleGabeBoaButton"
     button.Text = "Disable Gabe Boa"
-    button.Size = UDim2.new(0, 200, 0, 50) -- Small button
-    button.Position = UDim2.new(1, -220, 0.5, -25) -- Right side of the screen
-    button.BackgroundColor3 = Color3.fromRGB(163, 73, 164) -- Wanda Maximoff purple
+    button.Size = UDim2.new(0, 200, 0, 50)
+    button.Position = UDim2.new(1, -220, 0.5, -25)
+    button.BackgroundColor3 = Color3.fromRGB(128, 0, 0) -- Scarlet red
     button.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-    button.Font = Enum.Font.GothamBold
+    button.Font = Enum.Font.Fantasy -- Magical font style
     button.TextSize = 18
+    button.BorderSizePixel = 2
+    button.BorderColor3 = Color3.fromRGB(255, 69, 69) -- Glowing red border
     button.Parent = screenGui
+
+    -- Glow effect
+    local uiGradient = Instance.new("UIGradient")
+    uiGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 128, 128))
+    })
+    uiGradient.Parent = button
 
     -- Add drag functionality to the button
     local dragging = false
@@ -68,7 +78,7 @@ local function createToggleButton()
     button.MouseButton1Click:Connect(function()
         toggleGabeBoa()
         button.Text = isGabeBoaEnabled and "Disable Gabe Boa" or "Enable Gabe Boa"
-        button.BackgroundColor3 = isGabeBoaEnabled and Color3.fromRGB(163, 73, 164) or Color3.fromRGB(128, 0, 0) -- Purple for enabled, dark red for disabled
+        button.BackgroundColor3 = isGabeBoaEnabled and Color3.fromRGB(128, 0, 0) or Color3.fromRGB(64, 0, 0) -- Lighter red when enabled, darker when disabled
     end)
 end
 
@@ -88,6 +98,25 @@ end
 
 -- Start playing music and keep reference
 local music = playSound()
+
+-- Function to spawn character
+local function spawnCharacter()
+    local args = {
+        [1] = "RequestCharacter",
+        [2] = "InvisibleWoman", -- Replace with desired character
+        [3] = "Default"
+    }
+
+    local success, result = pcall(function()
+        return game:GetService("ReplicatedStorage"):WaitForChild("ClientModules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+    end)
+
+    if success then
+        print("[INFO] Character spawned successfully!")
+    else
+        print("[ERROR] Failed to spawn character:", result)
+    end
+end
 
 -- Anti-idle function to simulate activity
 local function antiIdle()
@@ -109,31 +138,32 @@ spawn(function()
 
     while true do
         if isGabeBoaEnabled then
-            local chest = Workspace:FindFirstChild("Chest")
-            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                if chest then
-                    -- Teleport to chest
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
-                    print("[INFO] Teleported to chest.")
-                    wait(1)
-                    -- Interact with chest
-                    if (chest.Body.CFrame.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10 then
-                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
-                        wait(5)
-                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
-                        print("[INFO] Interacted with chest.")
-                    else
-                        print("[INFO] Too far from chest.")
-                    end
-                else
-                    print("[INFO] Chest not found. Waiting for new chest.")
-                end
-            else
-                print("[INFO] Character not found. Waiting for respawn.")
+            if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                print("[INFO] Character not found. Respawning...")
+                spawnCharacter()
                 LocalPlayer.CharacterAdded:Wait()
             end
+
+            local chest = Workspace:FindFirstChild("Chest")
+            if chest then
+                -- Teleport to chest
+                LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
+                print("[INFO] Teleported to chest.")
+                wait(1)
+                -- Interact with chest
+                if (chest.Body.CFrame.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10 then
+                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
+                    wait(5)
+                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
+                    print("[INFO] Interacted with chest.")
+                else
+                    print("[INFO] Too far from chest.")
+                end
+            else
+                print("[INFO] Chest not found. Waiting for new chest.")
+            end
         else
-            -- Stop music and clear messages when disabled
+            -- Stop music when disabled
             if music.IsPlaying then
                 music:Stop()
             end
@@ -144,3 +174,6 @@ end)
 
 -- Run anti-idle in a separate thread
 spawn(antiIdle)
+
+-- Spawn character on game start
+spawnCharacter()
