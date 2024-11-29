@@ -1,10 +1,13 @@
 -- Gabe Boa Auto-Farming Script
--- Description: Auto-farming functionality with GUI, sound effects, camera correction, and auto-respawn.
+-- Description: Auto-farming functionality with GUI, sound effects, camera correction, anti-AFK, and auto-respawn.
 
--- Variables to manage the toggle state
 local autoFarmingEnabled = false
 local customGUIs = {}
 local customSounds = {}
+
+-- Ensure CoreGui is always enabled
+local StarterGui = game:GetService("StarterGui")
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
 
 -- Function to create and show GUI
 local function createAndShowGUI()
@@ -34,12 +37,23 @@ end
 local function playSound()
     local sound = Instance.new("Sound")
     sound.Name = "GabeBoaSound"
-    sound.SoundId = "rbxassetid://2820356263"
+    sound.SoundId = "rbxassetid://2820356263" -- Replace with your desired sound ID
     sound.Parent = game.Workspace
     sound.Looped = true
     sound.Volume = 10
     sound:Play()
     table.insert(customSounds, sound)
+end
+
+-- Function to stop all custom sounds
+local function stopAllSounds()
+    for _, sound in ipairs(customSounds) do
+        if sound and sound:IsA("Sound") then
+            sound:Stop()
+            sound:Destroy()
+        end
+    end
+    customSounds = {}
 end
 
 -- Function to set camera position
@@ -58,23 +72,25 @@ end
 
 -- Auto-respawn the character after death
 local function autoRespawnCharacter()
-    -- Monitor when the character is removed
     game.Players.LocalPlayer.CharacterRemoving:Connect(function()
         if autoFarmingEnabled then
-            wait(5) -- Delay before attempting to respawn
-            selectAndSpawnCharacter() -- Spawn the character
+            wait(5) -- Delay before respawning
+            selectAndSpawnCharacter()
         end
     end)
 
-    -- Restart farming and GUI after respawn
     game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
         if autoFarmingEnabled then
-            wait(1) -- Ensure character is fully loaded
+            wait(1)
             setCameraPosition()
             createAndShowGUI()
+            playSound()
             startAntiAfk()
-            spawn(farmChests) -- Resume chest farming
+            spawn(farmChests)
         end
+
+        -- Ensure CoreGui is re-enabled after respawn
+        StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
     end)
 end
 
@@ -167,17 +183,11 @@ local function cleanup()
     end
     customGUIs = {}
 
-    for _, sound in ipairs(customSounds) do
-        if sound and sound.Parent then
-            sound:Stop()
-            sound:Destroy()
-        end
-    end
-    customSounds = {}
+    stopAllSounds() -- Stop sounds when cleaning up
 end
 
--- Ensure Core GUI is not disabled
-game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
+-- Ensure CoreGui is not disabled
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
 
 -- Public interface for enabling/disabling farming
 return {
@@ -186,8 +196,8 @@ return {
         createAndShowGUI()
         playSound()
         selectAndSpawnCharacter()
-        setCameraPosition() -- Initial camera correction
-        autoRespawnCharacter() -- Ensure auto-respawn is active
+        setCameraPosition()
+        autoRespawnCharacter()
         spawn(farmChests)
         startAntiAfk()
     end,
