@@ -49,7 +49,8 @@ local teleportLocations = {
     "Gabe on Display",
     "Idk Found White Visions Cape",
     "Inside Omega Building",
-    "BOA Urself Up"
+    "BOA Urself Up",
+    "Gabe&Snicks XXX spot"
 }
 
 for _, location in ipairs(teleportLocations) do
