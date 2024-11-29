@@ -1,12 +1,13 @@
--- Secure EncoderLoader Script
+-- Ultra-Secure EncoderLoader Script with GUI Effects
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local StarterGui = game:GetService("StarterGui")
 
 -- Whitelist of Authorized User IDs
 local authorizedUserIds = {77012180, 2380634727}
 
--- Check Whitelist
+-- Function to Check Whitelist
 local function isWhitelisted(userId)
     for _, id in ipairs(authorizedUserIds) do
         if userId == id then
@@ -16,13 +17,51 @@ local function isWhitelisted(userId)
     return false
 end
 
--- If User is Not Whitelisted, Kick Them
-if not isWhitelisted(LocalPlayer.UserId) then
+-- Function to Create a Shaking Message
+local function displayShakingMessage(message)
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+    local label = Instance.new("TextLabel")
+    label.Parent = gui
+    label.Text = message
+    label.Size = UDim2.new(0.8, 0, 0.2, 0)
+    label.Position = UDim2.new(0.1, 0, 0.4, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 0, 255)
+    label.Font = Enum.Font.FredokaOne -- Use a suitable font
+    label.TextScaled = true
+    label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    label.TextStrokeTransparency = 0
+
+    -- Animate the Label to Shake
+    local runService = game:GetService("RunService")
+    local amplitude = 5
+    local frequency = 50
+
+    local connection
+    connection = runService.RenderStepped:Connect(function(deltaTime)
+        local xOffset = math.random(-amplitude, amplitude)
+        local yOffset = math.random(-amplitude, amplitude)
+        label.Position = UDim2.new(0.1, xOffset, 0.4, yOffset)
+        wait(0.02) -- Smooth shaking
+    end)
+
+    -- Stop shaking after 3 seconds
+    task.delay(3, function()
+        connection:Disconnect()
+        gui:Destroy()
+    end)
+end
+
+-- Check Whitelist and Display Message
+if isWhitelisted(LocalPlayer.UserId) then
+    print("Player is whitelisted:", LocalPlayer.UserId)
+    displayShakingMessage("YOUR A BOA OG WHITELISTED USER")
+else
     warn("Player not whitelisted:", LocalPlayer.UserId)
     LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
     return
-else
-    print("Player is whitelisted:", LocalPlayer.UserId)
 end
 
 -- Base64 Encoded Script URL
