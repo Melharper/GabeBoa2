@@ -65,13 +65,14 @@ local function autoRespawnCharacter()
         end
     end)
 
-    -- Ensure the GUI and farming restart after respawn
+    -- Restart farming and GUI after respawn
     game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
         if autoFarmingEnabled then
-            wait(1) -- Ensure character loads properly
+            wait(1) -- Wait for character to load fully
             setCameraPosition()
             createAndShowGUI()
             startAntiAfk()
+            spawn(farmChests) -- Resume chest farming
         end
     end)
 end
