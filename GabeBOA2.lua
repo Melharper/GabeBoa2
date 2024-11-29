@@ -1,21 +1,22 @@
 -- State control for enabling/disabling the script
 local isGabeBoaEnabled = true
 
+-- Services
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local LocalPlayer = Players.LocalPlayer
+
 -- Function to toggle Gabe Boa's functionality
 local function toggleGabeBoa()
     isGabeBoaEnabled = not isGabeBoaEnabled
-    if isGabeBoaEnabled then
-        print("[INFO] Gabe Boa Enabled")
-    else
-        print("[INFO] Gabe Boa Disabled")
-    end
+    print(isGabeBoaEnabled and "[INFO] Gabe Boa Enabled" or "[INFO] Gabe Boa Disabled")
 end
 
--- Function to create Scarlet Witch-themed GUI button with animations
+-- Create Scarlet Witch-themed GUI with animations
 local function createToggleButton()
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-
     -- Create ScreenGui
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "GabeBoaToggleGUI"
@@ -33,22 +34,15 @@ local function createToggleButton()
     button.TextSize = 18
     button.Parent = screenGui
 
-    -- Add animations to the button
+    -- Add glowing animation
     local uiGradient = Instance.new("UIGradient")
     uiGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 128, 128))
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(128, 0, 64))
     })
     uiGradient.Parent = button
 
-    -- Toggle functionality when button is clicked
-    button.MouseButton1Click:Connect(function()
-        toggleGabeBoa()
-        button.Text = isGabeBoaEnabled and "Disable Gabe Boa" or "Enable Gabe Boa"
-        button.BackgroundColor3 = isGabeBoaEnabled and Color3.fromRGB(128, 0, 0) or Color3.fromRGB(64, 0, 0)
-    end)
-
-    -- Add drag functionality
+    -- Draggable functionality
     local dragging = false
     local dragInput, dragStart, startPos
 
@@ -57,12 +51,6 @@ local function createToggleButton()
             dragging = true
             dragStart = input.Position
             startPos = button.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
         end
     end)
 
@@ -73,96 +61,102 @@ local function createToggleButton()
     end)
 
     game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
+        if dragging and input == dragInput then
             local delta = input.Position - dragStart
             button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
+
+    button.MouseButton1Click:Connect(function()
+        toggleGabeBoa()
+        button.Text = isGabeBoaEnabled and "Disable Gabe Boa" or "Enable Gabe Boa"
+        button.BackgroundColor3 = isGabeBoaEnabled and Color3.fromRGB(128, 0, 0) or Color3.fromRGB(64, 0, 0)
+    end)
 end
 
--- Create the toggle button
-createToggleButton()
+-- Display "Gabe is So BOAAA" on screen
+local function displayGabeBoaText()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "GabeBoaTextGUI"
+    screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- Play "Gabe is So Boa" animation upon execution
-local function playGabeBoaAnimation()
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://1234567890" -- Replace with "Gabe is so boa" sound asset ID
-    sound.Volume = 5
-    sound.Parent = game.Workspace
-    sound:Play()
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Text = "GABE IS SO BOAAA"
+    textLabel.Font = Enum.Font.Arcade
+    textLabel.TextSize = 50
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.TextStrokeTransparency = 0
+    textLabel.TextStrokeColor3 = Color3.fromRGB(128, 0, 0)
+    textLabel.Parent = screenGui
+
+    local fadeOut = TweenService:Create(textLabel, TweenInfo.new(2), { TextTransparency = 1 })
+    fadeOut:Play()
+    fadeOut.Completed:Connect(function()
+        screenGui:Destroy()
+    end)
 end
-playGabeBoaAnimation()
 
--- Function to spawn character
+-- Function to play background music
+local music
+local function playMusic()
+    music = Instance.new("Sound")
+    music.SoundId = "rbxassetid://2820356263" -- Replace with your music ID
+    music.Looped = true
+    music.Volume = 5
+    music.Parent = Workspace
+    if isGabeBoaEnabled then
+        music:Play()
+    end
+end
+
+-- Function to respawn character
 local function spawnCharacter()
     local args = {
         [1] = "RequestCharacter",
         [2] = "InvisibleWoman", -- Replace with your desired character
         [3] = "Default"
     }
+    ReplicatedStorage:WaitForChild("ClientModules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+end
 
-    local success, result = pcall(function()
-        return game:GetService("ReplicatedStorage"):WaitForChild("ClientModules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
-    end)
-
-    if success then
-        print("[INFO] Character spawned successfully!")
-    else
-        print("[ERROR] Failed to spawn character:", result)
+-- Monitor for respawn
+LocalPlayer.CharacterAdded:Connect(function()
+    print("[INFO] Character respawned.")
+    if isGabeBoaEnabled then
+        spawnCharacter()
     end
-end
-
--- Automatic respawn function
-local function monitorRespawn()
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-
-    LocalPlayer.CharacterAdded:Connect(function()
-        print("[INFO] Character respawned.")
-        if isGabeBoaEnabled then
-            spawnCharacter()
-        end
-    end)
-end
-
-monitorRespawn()
+end)
 
 -- Main farming loop
 spawn(function()
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-    local Workspace = game:GetService("Workspace")
-    local VirtualInputManager = game:GetService("VirtualInputManager")
-
     while true do
         if isGabeBoaEnabled then
             if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                print("[INFO] Character not found. Respawning...")
                 spawnCharacter()
-                LocalPlayer.CharacterAdded:Wait()
+                wait(5) -- Allow time for respawn
             end
 
             local chest = Workspace:FindFirstChild("Chest")
-            if chest then
-                -- Teleport to chest
+            if chest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
                 print("[INFO] Teleported to chest.")
                 wait(1)
-                -- Interact with chest
-                if (chest.Body.CFrame.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10 then
-                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
-                    wait(5)
-                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
-                    print("[INFO] Interacted with chest.")
-                else
-                    print("[INFO] Too far from chest.")
-                end
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
+                wait(5)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
+                print("[INFO] Interacted with chest.")
             else
-                print("[INFO] Chest not found. Waiting for new chest.")
+                print("[INFO] Chest not found.")
             end
-        else
-            wait(1) -- Small delay when disabled
         end
         wait(1)
     end
 end)
+
+-- Initialize
+createToggleButton()
+displayGabeBoaText()
+playMusic()
+spawnCharacter()
