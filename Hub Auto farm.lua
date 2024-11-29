@@ -1,15 +1,5 @@
--- Load OrionLib
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-
--- Create the window for the script
-local Window = OrionLib:MakeWindow({Name = "Gabe Boa Farming", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionConfig"})
-
--- Create the tab for auto-farming
-local Tab = Window:MakeTab({
-    Name = "Auto-Farming",
-    Icon = "rbxassetid://4483345998", -- Set a suitable icon
-    PremiumOnly = false
-})
+-- Module for Auto-Farming
+local AutoFarm = {}
 
 -- Variables to manage the toggle state
 local autoFarmingEnabled = false
@@ -147,7 +137,7 @@ local function autoRespawnCharacter()
 end
 
 -- Function to clean up custom resources
-local function cleanup()
+function AutoFarm.cleanup()
     autoFarmingEnabled = false
 
     -- Remove custom GUI elements
@@ -168,25 +158,16 @@ local function cleanup()
     customSounds = {}
 end
 
--- Add the toggle to OrionLib
-Tab:AddToggle({
-    Name = "Enable Auto-Farming",
-    Default = false,
-    Callback = function(value)
-        if value then
-            autoFarmingEnabled = true
-            createAndShowGUI()
-            playSound()
-            selectAndSpawnCharacter()
-            spawn(farmChests)
-            startAntiAfk()
-            autoRespawnCharacter()
-            setCameraPosition() -- Initial camera correction
-        else
-            cleanup()
-        end
-    end
-})
+-- Function to start auto-farming
+function AutoFarm.start()
+    autoFarmingEnabled = true
+    createAndShowGUI()
+    playSound()
+    selectAndSpawnCharacter()
+    spawn(farmChests)
+    startAntiAfk()
+    autoRespawnCharacter()
+    setCameraPosition() -- Initial camera correction
+end
 
--- Initialize OrionLib
-OrionLib:Init()
+return AutoFarm
