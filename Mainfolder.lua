@@ -1,60 +1,42 @@
--- Whitelist Check Loader Script
-print("Starting whitelist check...")
+print("Running whitelist check...")
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local localPlayer = Players.LocalPlayer
 
--- Whitelist URL
+-- URL to whitelist JSON
 local whitelistUrl = "https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/whitelist.json"
 
--- Fetch whitelist
-local success, response = pcall(function()
-    return game:HttpGet(whitelistUrl)
+-- Fetch and decode whitelist
+local success, data = pcall(function()
+    return HttpService:JSONDecode(game:HttpGet(whitelistUrl))
 end)
 
-if not success then
-    error("Failed to fetch whitelist. Error: " .. tostring(response))
+if not success or not data or not data.whitelist then
+    error("Whitelist fetch failed.")
 end
 
-print("Whitelist data fetched:", response)
-
--- Decode whitelist
-local whitelistData
-success, whitelistData = pcall(function()
-    return HttpService:JSONDecode(response)
-end)
-
-if not success or not whitelistData or not whitelistData.whitelist then
-    error("Failed to decode whitelist.")
-end
-
-print("Decoded whitelist:", HttpService:JSONEncode(whitelistData))
+print("Fetched whitelist:", HttpService:JSONEncode(data))
 
 -- Check if user is whitelisted
 local isWhitelisted = false
-for _, userId in ipairs(whitelistData.whitelist) do
-    if LocalPlayer.UserId == userId then
+for _, userId in ipairs(data.whitelist) do
+    if localPlayer.UserId == userId then
         isWhitelisted = true
         break
     end
 end
 
-if not isWhitelisted then
-    LocalPlayer:Kick("NotWhiteListed: You're not BOA..")
+if isWhitelisted then
+    print("Whitelist check passed! User is authorized.")
+else
+    print("User is not whitelisted.")
+    localPlayer:Kick("NotWhiteListed: You're not BOA..")
     return
 end
 
-print("User is whitelisted. Loading main script...")
-
 -- Load Main Script
+print("Attempting to load the main script...")
 local mainScriptUrl = "https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/Hub%20Auto%20farm.lua"
-local mainScriptSuccess, mainScriptError = pcall(function()
-    loadstring(game:HttpGet(mainScriptUrl))()
-end)
-
-if not mainScriptSuccess then
-    error("Failed to load main script. Error: " .. tostring(mainScriptError))
-end
-
-print("Main script loaded successfully.")
+loadstring(game:HttpGet(mainScriptUrl))()
+print("Main script loaded successfully!")
