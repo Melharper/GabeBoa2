@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
 
 -- State Control
 local isGabeBoaEnabled = true
@@ -91,6 +92,18 @@ local function playMusic()
     end
 end
 
+-- Adjust Camera
+local function adjustCamera()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 10, 0)
+        local targetPosition = LocalPlayer.Character.HumanoidRootPart.Position
+        Camera.CFrame = CFrame.new(position, targetPosition)
+        Camera.FieldOfView = 70
+        Camera.CameraType = Enum.CameraType.Custom
+        print("[INFO] Camera adjusted.")
+    end
+end
+
 -- Spawn Character
 local function spawnCharacter()
     local args = {
@@ -102,11 +115,12 @@ local function spawnCharacter()
     print("[INFO] Character spawned.")
 end
 
--- Respawn Character When Dead
+-- Respawn Character and Adjust Camera
 LocalPlayer.CharacterAdded:Connect(function()
     print("[INFO] Character respawned.")
     if isGabeBoaEnabled then
         wait(1) -- Ensure character fully loads
+        adjustCamera() -- Adjust camera after respawn
     end
 end)
 
@@ -128,6 +142,7 @@ spawn(function()
                 -- Teleport to chest
                 LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
                 print("[INFO] Teleported to chest.")
+                adjustCamera() -- Adjust camera after teleport
                 wait(1)
                 -- Interact with chest
                 VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
