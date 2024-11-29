@@ -1,4 +1,15 @@
-local AutoFarm = {}
+-- Load OrionLib
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+-- Create the window for the script
+local Window = OrionLib:MakeWindow({Name = "Gabe Boa Farming", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionConfig"})
+
+-- Create the tab for auto-farming
+local Tab = Window:MakeTab({
+    Name = "Auto-Farming",
+    Icon = "rbxassetid://4483345998", -- Set a suitable icon
+    PremiumOnly = false
+})
 
 -- Variables to manage the toggle state
 local autoFarmingEnabled = false
@@ -65,25 +76,19 @@ local function farmChests()
         local chest = Workspace:FindFirstChild("Chest")
         if chest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
-            setCameraPosition()  -- Correct the camera after teleport
         end
     end
 
     local function interactWithChest()
         local chest = Workspace:FindFirstChild("Chest")
         if chest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local chestPos = chest:FindFirstChild("Body") and chest.Body.CFrame.Position or chest.CFrame.Position
+            local chestPos = chest.Body.CFrame.Position
             local playerPos = LocalPlayer.Character.HumanoidRootPart.Position
 
-            -- Debugging distance check
-            print("Chest found, checking distance...")
             if (chestPos - playerPos).Magnitude <= 10 then
-                print("Pressing E to interact...") -- Debugging
                 VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
-                wait(5)  -- Wait for chest interaction
+                wait(5)
                 VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
-            else
-                print("Not close enough to interact.")
             end
         end
     end
@@ -132,18 +137,17 @@ end
 
 -- Function to respawn character
 local function autoRespawnCharacter()
-    -- Ensure that respawning only happens if auto-farming is enabled
-    if autoFarmingEnabled then
-        game.Players.LocalPlayer.CharacterRemoving:Connect(function()
+    game.Players.LocalPlayer.CharacterRemoving:Connect(function()
+        if autoFarmingEnabled then
             wait(5)
             selectAndSpawnCharacter()
             setCameraPosition() -- Correct camera after respawn
-        end)
-    end
+        end
+    end)
 end
 
 -- Function to clean up custom resources
-function AutoFarm.cleanup()
+local function cleanup()
     autoFarmingEnabled = false
 
     -- Remove custom GUI elements
@@ -162,21 +166,27 @@ function AutoFarm.cleanup()
         end
     end
     customSounds = {}
-
-    -- Stop respawn function when auto-farming is disabled
-    game.Players.LocalPlayer.CharacterRemoving:Disconnect()
 end
 
--- Function to start auto-farming
-function AutoFarm.start()
-    autoFarmingEnabled = true
-    createAndShowGUI()
-    playSound()
-    selectAndSpawnCharacter()
-    spawn(farmChests)
-    startAntiAfk()
-    autoRespawnCharacter()
-    setCameraPosition() -- Initial camera correction
-end
+-- Add the toggle to OrionLib
+Tab:AddToggle({
+    Name = "Enable Auto-Farming",
+    Default = false,
+    Callback = function(value)
+        if value then
+            autoFarmingEnabled = true
+            createAndShowGUI()
+            playSound()
+            selectAndSpawnCharacter()
+            spawn(farmChests)
+            startAntiAfk()
+            autoRespawnCharacter()
+            setCameraPosition() -- Initial camera correction
+        else
+            cleanup()
+        end
+    end
+})
 
-return AutoFarm
+-- Initialize OrionLib
+OrionLib:Init()
