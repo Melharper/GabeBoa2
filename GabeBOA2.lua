@@ -1,15 +1,15 @@
 -- Gabe Boa Auto-Farming Script
--- Description: Auto-farming features with teleport functionality and other utilities.
+-- Description: Auto-farming functionality with GUI and sound effects.
 
 -- Variables to manage the toggle state
 local autoFarmingEnabled = false
-local customGUIs = {} -- Track custom GUI objects for cleanup
-local customSounds = {} -- Track custom sound objects for cleanup
+local customGUIs = {}
+local customSounds = {}
 
 -- Function to create and show GUI
 local function createAndShowGUI()
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "GabeBoaGUI" -- Name to identify later for cleanup
+    screenGui.Name = "GabeBoaGUI"
     screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
     table.insert(customGUIs, screenGui)
 
@@ -33,7 +33,7 @@ end
 -- Function to play sound
 local function playSound()
     local sound = Instance.new("Sound")
-    sound.Name = "GabeBoaSound" -- Name to identify later for cleanup
+    sound.Name = "GabeBoaSound"
     sound.SoundId = "rbxassetid://2820356263"
     sound.Parent = game.Workspace
     sound.Looped = true
@@ -55,20 +55,66 @@ local function selectAndSpawnCharacter()
     end)
 end
 
--- Function to teleport to a specific location
-local function teleportToLocation(location)
-    local player = game.Players.LocalPlayer
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local humanoidRootPart = player.Character.HumanoidRootPart
-        humanoidRootPart.CFrame = location.CFrame
+-- Function to teleport to and interact with chests
+local function farmChests()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Workspace = game:GetService("Workspace")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+
+    local function teleportToChest()
+        local chest = Workspace:FindFirstChild("Chest")
+        if chest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = chest.Body.CFrame
+        end
     end
+
+    local function interactWithChest()
+        local chest = Workspace:FindFirstChild("Chest")
+        if chest and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local chestPos = chest.Body.CFrame.Position
+            local playerPos = LocalPlayer.Character.HumanoidRootPart.Position
+
+            if (chestPos - playerPos).Magnitude <= 10 then
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
+                wait(5)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
+            end
+        end
+    end
+
+    while autoFarmingEnabled do
+        local chest = Workspace:FindFirstChild("Chest")
+        if chest then
+            teleportToChest()
+            wait(1)
+            interactWithChest()
+        end
+        wait(1)
+    end
+end
+
+-- Function to prevent AFK
+local function startAntiAfk()
+    spawn(function()
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        while autoFarmingEnabled do
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid:Move(Vector3.new(0.1, 0, 0))
+                end
+            end
+            wait(60)
+        end
+    end)
 end
 
 -- Function to clean up custom resources
 local function cleanup()
     autoFarmingEnabled = false
 
-    -- Remove custom GUI elements
     for _, gui in ipairs(customGUIs) do
         if gui and gui.Parent then
             gui:Destroy()
@@ -76,7 +122,6 @@ local function cleanup()
     end
     customGUIs = {}
 
-    -- Stop and remove custom sounds
     for _, sound in ipairs(customSounds) do
         if sound and sound.Parent then
             sound:Stop()
@@ -86,25 +131,18 @@ local function cleanup()
     customSounds = {}
 end
 
--- Add functions to enable farming
+-- Public interface for enabling/disabling farming
 return {
     enableFarming = function()
         autoFarmingEnabled = true
         createAndShowGUI()
         playSound()
         selectAndSpawnCharacter()
+        spawn(farmChests)
+        startAntiAfk()
     end,
 
     disableFarming = function()
         cleanup()
-    end,
-
-    teleportToPowerstone = function()
-        local powerStone = game.Workspace:FindFirstChild("PowerStone")
-        if powerStone then
-            teleportToLocation(powerStone)
-        else
-            warn("PowerStone not found in the workspace.")
-        end
     end
 }
