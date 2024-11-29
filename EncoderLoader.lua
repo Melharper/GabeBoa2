@@ -5,7 +5,7 @@ local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 
 -- Whitelist of Authorized User IDs
-local authorizedUserIds = {77012180, 2380634727}
+local authorizedUserIds = {77012180}
 
 -- Function to Check Whitelist
 local function isWhitelisted(userId)
