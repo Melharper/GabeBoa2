@@ -1,15 +1,17 @@
 -- Encoded Loader Script
 local HttpService = game:GetService("HttpService")
 
--- Base64-encoded URL for the actual script
-local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
+-- Obfuscated and jumbled URL logic
+local parts = {
+    "https://raw.", "githubuser", "content.com/", "Melhar", "per/Gab",
+    "eBoa2/re", "fs/hea", "ds/main/", "Hub%20", "Auto%20", "farm.", "lua"
+}
 
--- Decode the Base64-encoded URL
-local decodedUrl = game:GetService("HttpService"):Base64Decode(encodedUrl)
+local url = table.concat(parts) -- Combine all parts into the URL
 
--- Fetch and execute the script from the decoded URL
+-- Fetch and execute the script from the obfuscated URL
 local success, err = pcall(function()
-    loadstring(game:HttpGet(decodedUrl))()
+    loadstring(game:HttpGet(url))()
 end)
 
 -- Error handling (optional)
