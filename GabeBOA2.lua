@@ -62,7 +62,16 @@ local function autoRespawnCharacter()
         if autoFarmingEnabled then
             wait(5) -- Delay before respawning
             selectAndSpawnCharacter()
-            setCameraPosition() -- Correct camera after respawn
+        end
+    end)
+
+    -- Ensure the GUI and farming restart after respawn
+    game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+        if autoFarmingEnabled then
+            wait(1) -- Ensure character loads properly
+            setCameraPosition()
+            createAndShowGUI()
+            startAntiAfk()
         end
     end)
 end
@@ -155,6 +164,9 @@ local function cleanup()
     end
     customSounds = {}
 end
+
+-- Ensure Core GUI is not disabled
+game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
 
 -- Public interface for enabling/disabling farming
 return {
