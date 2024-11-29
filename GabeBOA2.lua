@@ -132,6 +132,17 @@ LocalPlayer.CharacterRemoving:Connect(function()
     end
 end)
 
+-- Periodic Death Check (every 15 minutes)
+spawn(function()
+    while true do
+        if not LocalPlayer.Character and isGabeBoaEnabled then
+            print("[INFO] Player is dead. Respawning...")
+            spawnCharacter()
+        end
+        wait(900) -- Wait for 15 minutes before checking again
+    end
+end)
+
 -- Chest Farming Functionality
 spawn(function()
     while true do
@@ -163,4 +174,9 @@ end)
 createToggleButton()
 displayGabeBoaText()
 playMusic()
-spawnCharacter()
+
+-- On first enable, ensure spawn
+if not LocalPlayer.Character then
+    spawnCharacter() -- Force spawn if character is missing
+    adjustCamera() -- Adjust camera
+end
