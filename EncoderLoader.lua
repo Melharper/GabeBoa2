@@ -1,16 +1,26 @@
+-- Secure EncoderLoader Script
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 -- Whitelist
-local authorizedUserIds = { 77012180, 2380634727 }
-if not table.find(authorizedUserIds, LocalPlayer.UserId) then
-    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
-    return
+local authorizedUserIds = {77012180, 2380634727}
+
+-- Check Whitelist
+local function isWhitelisted(userId)
+    for _, id in ipairs(authorizedUserIds) do
+        if userId == id then return true end
+    end
+    return false
 end
 
--- Debug: Whitelist check
-print("Player is whitelisted:", LocalPlayer.UserId)
+if not isWhitelisted(LocalPlayer.UserId) then
+    warn("Player not whitelisted:", LocalPlayer.UserId)
+    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
+    return
+else
+    print("Player is whitelisted:", LocalPlayer.UserId)
+end
 
 -- Base64 Decoder
 local function Base64Decode(data)
@@ -29,16 +39,26 @@ local function Base64Decode(data)
     end))
 end
 
--- Encoded Layers
+-- Encoded URLs
 local encodedUrls = {
     "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 }
 
--- Decode
-local decodedUrl = Base64Decode(encodedUrls[1])
-print("Decoded URL:", decodedUrl)
+-- Decode Layers
+local function decodeLayers(layers)
+    local decoded = Base64Decode(layers[1])
+    for i = 2, #layers do
+        decoded = Base64Decode(decoded)
+        print("Decoded Layer " .. i .. ":", decoded)
+    end
+    return decoded
+end
 
--- Execute
+-- Decode URL
+local decodedUrl = decodeLayers(encodedUrls)
+print("Final Decoded URL:", decodedUrl)
+
+-- Execute Script
 local success, err = pcall(function()
     loadstring(game:HttpGet(decodedUrl))()
 end)
