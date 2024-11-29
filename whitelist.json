@@ -1,6 +1,7 @@
 {
     "whitelist": [
-        1234567890,
-        9876543210
+        77012180,        // Your user ID
+        1234567890,      // Example user ID (remove or replace if needed)
+        9876543210       // Example user ID (remove or replace if needed)
     ]
 }
