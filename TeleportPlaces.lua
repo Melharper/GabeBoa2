@@ -2,17 +2,17 @@
 
 local BoaTeleports = {}
 
--- Table of teleport locations
+-- Table of teleport locations (corrected format)
 local teleportLocations = {
-    ["Powerstone BOA"] = Vector3.new(891.727783203125, 150.69863891601562, 956.6730346679688),
-    ["Arena BOA"] = Vector3.new(1007.6874389648438, 382.5484313964844, 767.2255249023438),
-    ["BOA By The Beach"] = Vector3.new(2711.3310546875, 109.19770812988281, -956.5808715820312),
-    ["Gabe’s Got Candy"] = Vector3.new(2048.26025390625, 108.09971618652344, -898.4105834960938),
-    ["Back Of The Bus Gabe"] = Vector3.new(1535.5809326171875, 108.09658813476562, -107.3639907836914),
-    ["Gabe on Display"] = Vector3.new(1496.693603515625, 108.12211608886719, -74.29036712646484),
-    ["Idk Found White Visions Cape"] = Vector3.new(-86.74132537841797, 352.6211242675781, -87.8761215209961),
-    ["Inside Omega Building"] = Vector3.new(2684.5498046875, 106.09970092773438, -14.75610065460205),
-    ["BOA Urself Up"] = Vector3.new(2520.518798828125, 112.09800720214844, 319.3023681640625),
+    ["Powerstone BOA"] = Vector3.new(891.727783, 150.698639, 956.673035),
+    ["Arena BOA"] = Vector3.new(1007.687439, 382.548431, 767.225525),
+    ["BOA By The Beach"] = Vector3.new(2711.331055, 109.197708, -956.580872),
+    ["Gabe’s Got Candy"] = Vector3.new(2048.260254, 108.099716, -898.410584),
+    ["Back Of The Bus Gabe"] = Vector3.new(1535.580933, 108.096588, -107.363991),
+    ["Gabe on Display"] = Vector3.new(1496.693604, 108.122116, -74.290367),
+    ["Idk Found White Visions Cape"] = Vector3.new(-86.741325, 352.621124, -87.876122),
+    ["Inside Omega Building"] = Vector3.new(2684.549805, 106.099701, -14.756101),
+    ["BOA Urself Up"] = Vector3.new(2520.518799, 112.098007, 319.302368),
     ["Gabe&Snicks XXX spot"] = Vector3.new(2199.461426, 108.099716, -898.677795) -- Added new location
 }
 
