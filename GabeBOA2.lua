@@ -1,5 +1,5 @@
 -- Gabe Boa Auto-Farming Script
--- Description: Auto-farming functionality with GUI and sound effects.
+-- Description: Auto-farming functionality with GUI, sound effects, camera correction, and auto-respawn.
 
 -- Variables to manage the toggle state
 local autoFarmingEnabled = false
@@ -40,6 +40,31 @@ local function playSound()
     sound.Volume = 10
     sound:Play()
     table.insert(customSounds, sound)
+end
+
+-- Function to set camera position
+local function setCameraPosition()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Camera = workspace.CurrentCamera
+
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local character = LocalPlayer.Character
+        local position = character.HumanoidRootPart.Position + Vector3.new(0, 10, 0)
+        local targetPosition = character.HumanoidRootPart.Position
+        Camera.CFrame = CFrame.new(position, targetPosition)
+    end
+end
+
+-- Auto-respawn the character after death
+local function autoRespawnCharacter()
+    game.Players.LocalPlayer.CharacterRemoving:Connect(function()
+        if autoFarmingEnabled then
+            wait(5) -- Delay before respawning
+            selectAndSpawnCharacter()
+            setCameraPosition() -- Correct camera after respawn
+        end
+    end)
 end
 
 -- Function to select and spawn the character
@@ -138,6 +163,8 @@ return {
         createAndShowGUI()
         playSound()
         selectAndSpawnCharacter()
+        setCameraPosition() -- Initial camera correction
+        autoRespawnCharacter() -- Ensure auto-respawn is active
         spawn(farmChests)
         startAntiAfk()
     end,
