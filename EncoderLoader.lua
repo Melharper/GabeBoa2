@@ -1,5 +1,32 @@
+-- Base64 encoded URL (https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/url_decoder.lua)
+local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvcmVmcy9oZWFkcy9tYWluL3VybF9kZWNvZGVyLmx1YQ=="
+
+-- Base64 decoding function
+local function decodeBase64(data)
+    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    data = string.gsub(data, '[^' .. b .. '=]', '')
+    return (data:gsub('.', function(x)
+        if x == '=' then return '' end
+        local r, f = '', (b:find(x) - 1)
+        for i = 6, 1, -1 do
+            r = r .. (f % 2 ^ i - f % 2 ^ (i - 1) > 0 and '1' or '0')
+        end
+        return r
+    end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
+        if #x ~= 8 then return '' end
+        local c = 0
+        for i = 1, 8 do
+            c = c + (x:sub(i, i) == '1' and 2 ^ (8 - i) or 0)
+        end
+        return string.char(c)
+    end))
+end
+
+-- Decode the URL from the Base64 string
+local decodedUrl = decodeBase64(encodedUrl)
+
 -- Fetch the URL decoder script securely (hidden logic)
-local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/url_decoder.lua")
+local urlDecoderScript = game:HttpGet(decodedUrl)
 local urlDecoder = loadstring(urlDecoderScript)()  -- Execute the URL decoder script and return the object
 
 -- Access the decoded URL and whitelist check function (already handled in url_decoder.lua)
