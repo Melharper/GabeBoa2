@@ -5,7 +5,7 @@ local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
 -- Fetch the URL decoder script securely (hidden logic)
-local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/hidden_url_decoder.lua")
+local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/url_decoder.lua")
 local urlDecoder = loadstring(urlDecoderScript)()  -- Execute the URL decoder script and return the object
 
 -- Access the decoded URL and whitelist check function
