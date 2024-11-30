@@ -1,9 +1,9 @@
--- Dynamically decode the URL
+-- Dynamically decode the URL (hidden logic)
 local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 
 local function decodeBase64(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
+    data = string.gsub(data, '[^' .. b .. '=]', '')
     return (data:gsub('.', function(x)
         if x == '=' then return '' end
         local r, f = '', (b:find(x) - 1)
@@ -21,8 +21,6 @@ local function decodeBase64(data)
     end))
 end
 
--- Decode the Script URL
+-- Decode the script URL and return it
 local decodedUrl = decodeBase64(encodedUrl)
-print("Decoded URL:", decodedUrl) -- Debugging: Print the decoded URL.
-
-return decodedUrl  -- Return the decoded URL
+return decodedUrl
