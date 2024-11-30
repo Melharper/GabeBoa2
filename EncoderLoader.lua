@@ -136,35 +136,18 @@ else
     end)
 end
 
--- Securely decode the URL using a secondary decoder
-local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
+-- Fetch the decoded URL from url_decoder.lua (it should now point to the correct Hub Auto Farm script)
+local decodedUrl = "https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/Hub%20Auto%20farm.lua"
 
--- Fetch the URL decoder script (this is the critical part that was causing the issue)
-local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/hidden_url_decoder.lua")
-
--- Check if the urlDecoderScript was fetched successfully
-if urlDecoderScript then
-    -- Debugging: Make sure urlDecoderScript is being fetched
-    print("URL Decoder Script fetched successfully!")
-
-    -- Execute the URL decoder script
-    local decodedUrl = loadstring(urlDecoderScript)()
-
-    -- Don't print the decoded URL to console
-    -- print("Decoded URL:", decodedUrl)  -- Commented out to avoid showing the URL in the console
-
-    -- Check if the decoded URL is valid and not empty
-    if decodedUrl and decodedUrl ~= "" then
-        -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
-        local success, errorMessage = pcall(function()
-            loadstring(game:HttpGet(decodedUrl))()
-        end)
-        if not success then
-            warn("Error loading script:", errorMessage) -- Error loading the script
-        end
-    else
-        warn("Decoded URL is invalid or empty!")
+-- Check if the decoded URL is valid and not empty
+if decodedUrl and decodedUrl ~= "" then
+    -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
+    local success, errorMessage = pcall(function()
+        loadstring(game:HttpGet(decodedUrl))()
+    end)
+    if not success then
+        warn("Error loading script:", errorMessage) -- Error loading the script
     end
 else
-    warn("Failed to fetch the URL decoder script!")
+    warn("Decoded URL is invalid or empty!")
 end
