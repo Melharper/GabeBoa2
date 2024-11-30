@@ -3,7 +3,7 @@ local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVm
 
 local function decodeBase64(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    data = string.gsub(data, '[^' .. b .. '=]', '')
+    data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
     return (data:gsub('.', function(x)
         if x == '=' then return '' end
         local r, f = '', (b:find(x) - 1)
@@ -21,6 +21,12 @@ local function decodeBase64(data)
     end))
 end
 
--- Decode the script URL and print it
+-- Decode the script URL and clean it
 local decodedUrl = decodeBase64(encodedUrl)
+decodedUrl = decodedUrl:gsub("https://raw.github. com", "https://raw.githubusercontent.com") -- Fix the URL
+
+-- Print the final decoded URL
 print("Decoded URL:", decodedUrl)
+
+-- If valid URL, return it
+return decodedUrl
