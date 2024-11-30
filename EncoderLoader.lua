@@ -4,10 +4,10 @@ local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
--- Whitelist of authorized User IDs (obfuscated using Base64)
-local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw==" -- Base64 encoded version of {77012180, 2380634727}
+-- Base64-encoded whitelist (Base64 of [77012180, 2380634727])
+local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw=="
 
--- Function to decode Base64 manually
+-- Function to manually decode Base64 without HttpService (manual decoding)
 local function Base64Decode(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
@@ -28,12 +28,17 @@ local function Base64Decode(data)
     end))
 end
 
--- Function to decode and check if user is whitelisted
+-- Function to decode and check if the user is whitelisted
 local function isWhitelisted(userId)
-    -- Decode the Base64 encoded whitelist
     local decodedIds = Base64Decode(encodedWhitelistedIds)
-    local ids = HttpService:JSONDecode("[" .. decodedIds .. "]")  -- Decode the Base64 string into a JSON array
+    print("Decoded IDs: " .. decodedIds) -- Debugging: Check decoded base64 result
 
+    local ids = {}
+    for match in decodedIds:gmatch("%d+") do
+        table.insert(ids, tonumber(match))
+    end
+
+    -- Check if the userId matches any in the whitelist
     for _, id in ipairs(ids) do
         if userId == id then
             return true
@@ -84,7 +89,7 @@ local function playWhitelistedSound()
     additionalSound:Play()
 end
 
--- Auto-kick if user is not whitelisted
+-- Auto-kick if the user is not whitelisted
 if not isWhitelisted(LocalPlayer.UserId) then
     -- Play all non-whitelisted sounds and kick the player
     playNonWhitelistedSounds()
