@@ -4,7 +4,7 @@ local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
--- Base64 encoded whitelist and URL (updated to include new users)
+-- Base64 encoded whitelist and URL (obfuscated with multiple user IDs)
 local encodedWhitelist = "NzcwMTIxODA=,MjM4MDYzNDcyNw==,NjkyODU4NDA="  -- Base64 encoded version of {77012180, 2380634727, 69285840}
 local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 
@@ -32,6 +32,10 @@ end
 -- Decode whitelist and URL
 local decodedWhitelist = decodeBase64(encodedWhitelist)
 local decodedUrl = decodeBase64(encodedUrl)
+
+-- Print out the decoded values for debugging
+print("Decoded Whitelist:", decodedWhitelist)
+print("Decoded URL:", decodedUrl)
 
 -- Function to check if the player is whitelisted
 local function isWhitelisted(userId)
