@@ -31,8 +31,13 @@ end
 
 -- Function to decode and check if user is whitelisted
 local function isWhitelisted(userId)
+    -- Decode the Base64 string
     local decodedIds = Base64Decode(encodedWhitelistedIds)
-    local ids = HttpService:JSONDecode(decodedIds)  -- Directly decode Base64 decoded string into JSON format
+    -- Try to parse it as JSON
+    local ids = {}
+    pcall(function()
+        ids = HttpService:JSONDecode("[" .. decodedIds .. "]")  -- Decode the Base64 string into JSON format
+    end)
 
     -- Check if the user is in the decoded whitelist
     for _, id in ipairs(ids) do
