@@ -6,7 +6,7 @@ local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
 -- Whitelist of authorized User IDs (obfuscated using Base64)
-local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw==" -- Base64 encoded version of {77012180, 2380634727}
+local encodedWhitelistedIds = "NzcwMTIxODA=" -- Base64 encoded version of {77012180}
 
 -- Function to decode Base64 without HttpService (manual decoding)
 local function Base64Decode(data)
