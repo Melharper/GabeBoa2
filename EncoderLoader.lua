@@ -1,13 +1,14 @@
+-- Ultra-Secure EncoderLoader Script with Multiple Sounds on Kick
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
--- Base64-encoded whitelist (Base64 of [77012180, 2380634727])
-local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw=="
+-- Whitelist of authorized User IDs (obfuscated using Base64)
+local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw==" -- Base64 encoded version of {77012180, 2380634727}
 
--- Function to manually decode Base64 without HttpService (manual decoding)
+-- Function to decode Base64 without HttpService (manual decoding)
 local function Base64Decode(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
@@ -28,17 +29,11 @@ local function Base64Decode(data)
     end))
 end
 
--- Function to decode and check if the user is whitelisted
+-- Function to decode and check if user is whitelisted
 local function isWhitelisted(userId)
     local decodedIds = Base64Decode(encodedWhitelistedIds)
-    print("Decoded IDs: " .. decodedIds) -- Debugging: Check decoded base64 result
+    local ids = HttpService:JSONDecode("[" .. decodedIds .. "]")  -- Decode the Base64 string into JSON format
 
-    local ids = {}
-    for match in decodedIds:gmatch("%d+") do
-        table.insert(ids, tonumber(match))
-    end
-
-    -- Check if the userId matches any in the whitelist
     for _, id in ipairs(ids) do
         if userId == id then
             return true
@@ -80,16 +75,9 @@ local function playWhitelistedSound()
     -- Stop the sound after 4 seconds
     wait(4)
     sound:Stop()
-
-    -- Additional sound for whitelisted users
-    local additionalSound = Instance.new("Sound")
-    additionalSound.SoundId = "rbxassetid://9656754733"
-    additionalSound.Volume = 10
-    additionalSound.Parent = game.Workspace
-    additionalSound:Play()
 end
 
--- Auto-kick if the user is not whitelisted
+-- Auto-kick if user is not whitelisted
 if not isWhitelisted(LocalPlayer.UserId) then
     -- Play all non-whitelisted sounds and kick the player
     playNonWhitelistedSounds()
@@ -109,18 +97,11 @@ else
     label.Size = UDim2.new(0.8, 0, 0.2, 0)
     label.Position = UDim2.new(0.1, 0, 0.4, 0)
     label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(255, 0, 0)  -- Chaos Red color
+    label.TextColor3 = Color3.fromRGB(255, 0, 255)  -- Purple color
     label.Font = Enum.Font.FredokaOne
     label.TextScaled = true
     label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
     label.TextStrokeTransparency = 0
-
-    -- Simulate the blood drip effect by moving the text down slowly
-    local dripTime = 0.1
-    for i = 1, 10 do
-        label.Position = label.Position + UDim2.new(0, 0, 0.05, 0)
-        wait(dripTime)
-    end
 
     -- Animate the Label to Shake
     local runService = game:GetService("RunService")
@@ -135,8 +116,8 @@ else
         wait(0.02) -- Smooth shaking
     end)
 
-    -- Stop shaking after 8 seconds and destroy the GUI
-    task.delay(8, function()
+    -- Stop shaking after 3 seconds
+    task.delay(3, function()
         connection:Disconnect()
         gui:Destroy()
     end)
