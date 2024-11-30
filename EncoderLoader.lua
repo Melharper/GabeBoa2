@@ -4,42 +4,13 @@ local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
--- Whitelist of authorized User IDs (obfuscated using Base64)
-local encodedWhitelistedIds = "NzcwMTIxODA=" -- Base64 encoded version of {77012180}
+-- Fetch the URL decoder script securely (hidden logic)
+local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/hidden_url_decoder.lua")
+local urlDecoder = loadstring(urlDecoderScript)()  -- Execute the URL decoder script and return the object
 
--- Function to decode Base64 without HttpService (manual decoding)
-local function Base64Decode(data)
-    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
-    return (data:gsub('.', function(x)
-        if x == '=' then return '' end
-        local r, f = '', (b:find(x) - 1)
-        for i = 6, 1, -1 do
-            r = r .. (f % 2 ^ i - f % 2 ^ (i - 1) > 0 and '1' or '0')
-        end
-        return r
-    end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
-        if #x ~= 8 then return '' end
-        local c = 0
-        for i = 1, 8 do
-            c = c + (x:sub(i, i) == '1' and 2 ^ (8 - i) or 0)
-        end
-        return string.char(c)
-    end))
-end
-
--- Function to decode and check if user is whitelisted
-local function isWhitelisted(userId)
-    local decodedIds = Base64Decode(encodedWhitelistedIds)
-    local ids = HttpService:JSONDecode("[" .. decodedIds .. "]")  -- Decode the Base64 string into JSON format
-
-    for _, id in ipairs(ids) do
-        if userId == id then
-            return true
-        end
-    end
-    return false
-end
+-- Access the decoded URL and whitelist check function
+local decodedUrl = urlDecoder.decodedUrl
+local isWhitelisted = urlDecoder.isWhitelisted
 
 -- Function to play multiple sounds for non-whitelisted users
 local function playNonWhitelistedSounds()
@@ -135,9 +106,6 @@ else
         gui:Destroy()
     end)
 end
-
--- Fetch the decoded URL from url_decoder.lua (it should now point to the correct Hub Auto Farm script)
-local decodedUrl = "https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/Hub%20Auto%20farm.lua"
 
 -- Check if the decoded URL is valid and not empty
 if decodedUrl and decodedUrl ~= "" then
