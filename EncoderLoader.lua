@@ -5,7 +5,7 @@ local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
--- Whitelist of authorized User IDs (obfuscated)
+-- Whitelist of authorized User IDs (obfuscated using Base64)
 local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw==" -- Base64 encoded version of {77012180, 2380634727}
 
 -- Function to decode and check whitelist
@@ -89,8 +89,8 @@ else
     end)
 end
 
--- Base64 Encoded Script URL
-local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ==" -- Replace this with your Base64-encoded URL.
+-- Base64 Encoded Script URL (Change this URL as needed)
+local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 
 -- Base64 Decoder
 local function decodeBase64(data)
