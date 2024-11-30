@@ -139,17 +139,29 @@ end
 -- Securely decode the URL using a secondary decoder
 local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 
--- Hide the URL decoder and obfuscate it further
-local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/hidden_url_decoder.lua")  -- Hidden URL to the decoder script
-local decodedUrl = loadstring(urlDecoderScript)()  -- Execute the URL decoder script
+-- Fetch the URL decoder script (this is the critical part that was causing the issue)
+local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/hidden_url_decoder.lua")
 
--- Don't print the decoded URL to console
--- print("Decoded URL:", decodedUrl)  -- Commented out to avoid showing the URL in the console
+-- Check if the urlDecoderScript was fetched successfully
+if urlDecoderScript then
+    -- Execute the URL decoder script
+    local decodedUrl = loadstring(urlDecoderScript)()
 
--- Check if the decoded URL is valid and not empty
-if decodedUrl and decodedUrl ~= "" then
-    -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
-    loadstring(game:HttpGet(decodedUrl))()
+    -- Don't print the decoded URL to console
+    -- print("Decoded URL:", decodedUrl)  -- Commented out to avoid showing the URL in the console
+
+    -- Check if the decoded URL is valid and not empty
+    if decodedUrl and decodedUrl ~= "" then
+        -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
+        local success, errorMessage = pcall(function()
+            loadstring(game:HttpGet(decodedUrl))()
+        end)
+        if not success then
+            warn("Error loading script:", errorMessage) -- Error loading the script
+        end
+    else
+        warn("Decoded URL is invalid or empty!")
+    end
 else
-    warn("Decoded URL is invalid or empty!")
+    warn("Failed to fetch the URL decoder script!")
 end
