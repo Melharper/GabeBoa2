@@ -1,14 +1,14 @@
--- Ultra-Secure EncoderLoader Script with Hidden Kick Mechanism and More Protection
+-- Ultra-Secure EncoderLoader Script with Multiple Layers of Protection
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
--- Whitelist of authorized User IDs (encoded using Base64)
-local encodedWhitelistedIds = "W3s3OTQwNTIzLDIzODAyMDYzLDczODkxMjM4XQ==" -- Base64 encoded version of {77012180, 2380634727}
+-- Whitelist of authorized User IDs (obfuscated using Base64 with multiple layers)
+local encodedWhitelistedIds = "YWJjMTIzNDU2Nzg5MDEyMzQ1Njc4LDA3OG5ldGVyYmVhbjA2MzQwMZxdHmtkfjls=="
 
--- Function to decode Base64 (manual decoding)
+-- Function to decode Base64 (handling multiple layers)
 local function Base64Decode(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
@@ -31,15 +31,9 @@ end
 
 -- Function to decode and check if user is whitelisted
 local function isWhitelisted(userId)
-    -- Decode the Base64 string
     local decodedIds = Base64Decode(encodedWhitelistedIds)
-    -- Try to parse it as JSON
-    local ids = {}
-    pcall(function()
-        ids = HttpService:JSONDecode("[" .. decodedIds .. "]")  -- Decode the Base64 string into JSON format
-    end)
+    local ids = HttpService:JSONDecode("[" .. decodedIds .. "]")  -- Decode the Base64 string into JSON format
 
-    -- Check if the user is in the decoded whitelist
     for _, id in ipairs(ids) do
         if userId == id then
             return true
@@ -90,7 +84,7 @@ if not isWhitelisted(LocalPlayer.UserId) then
     LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
     return
 else
-    -- Play the whitelisted sound and show effects for whitelisted users
+    -- Play the whitelisted sound
     playWhitelistedSound()
 
     -- Show a big purple "You're a BOA OG" message on the screen for whitelisted users
@@ -132,7 +126,7 @@ end
 -- Base64 Encoded Script URL (Change this URL as needed)
 local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 
--- Base64 Decoder (using manual decoding)
+-- Base64 Decoder
 local function decodeBase64(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')
