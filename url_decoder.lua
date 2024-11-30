@@ -4,8 +4,8 @@ local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
--- Base64 encoded whitelist and URL
-local encodedWhitelist = "NzcwMTIxODA="  -- Base64 encoded version of {77012180}
+-- Base64 encoded whitelist and URL (updated to include new users)
+local encodedWhitelist = "NzcwMTIxODA=,MjM4MDYzNDcyNw==,NjkyODU4NDA="  -- Base64 encoded version of {77012180, 2380634727, 69285840}
 local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 
 -- Decode Base64 function
