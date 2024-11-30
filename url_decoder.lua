@@ -1,9 +1,13 @@
--- Dynamically decode the URL (hidden logic)
+-- Dynamically decode the URL and check the whitelist (hidden logic)
+
+-- Base64-encoded whitelist and URL
+local encodedWhitelist = "NzcwMTIxODA="  -- Base64 encoded version of {77012180}
 local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 
+-- Decode Base64 function
 local function decodeBase64(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
+    data = string.gsub(data, '[^' .. b .. '=]', '')
     return (data:gsub('.', function(x)
         if x == '=' then return '' end
         local r, f = '', (b:find(x) - 1)
@@ -21,14 +25,23 @@ local function decodeBase64(data)
     end))
 end
 
--- Decode the script URL and clean it
+-- Decode whitelist and URL
+local decodedWhitelist = decodeBase64(encodedWhitelist)
 local decodedUrl = decodeBase64(encodedUrl)
 
--- Correct the URL
-decodedUrl = decodedUrl:gsub("https://raw.githubcom", "https://raw.githubusercontent.com")  -- Fix the typo in URL
+-- Function to check if the player is whitelisted
+local function isWhitelisted(userId)
+    local ids = HttpService:JSONDecode("[" .. decodedWhitelist .. "]")
+    for _, id in ipairs(ids) do
+        if userId == id then
+            return true
+        end
+    end
+    return false
+end
 
--- Print the final decoded URL
-print("Decoded URL:", decodedUrl)
-
--- If valid URL, return it
-return decodedUrl
+-- Return the decoded URL and the whitelist check function
+return {
+    decodedUrl = decodedUrl,
+    isWhitelisted = isWhitelisted
+}
