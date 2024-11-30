@@ -2,7 +2,7 @@
 local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/url_decoder.lua")
 local urlDecoder = loadstring(urlDecoderScript)()  -- Execute the URL decoder script and return the object
 
--- Access the decoded URL and whitelist check function (already handled in url_decoder.lua)
+-- Access the decoded URL and whitelist check function
 local decodedUrl = urlDecoder.decodedUrl
 local isWhitelisted = urlDecoder.isWhitelisted
 
