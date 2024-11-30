@@ -137,10 +137,14 @@ else
 end
 
 -- Securely decode the URL using a secondary decoder
-local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/url_decoder.lua")
+local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
+
+-- Hide the URL decoder and obfuscate it further
+local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/hidden_url_decoder.lua")  -- Hidden URL to the decoder script
 local decodedUrl = loadstring(urlDecoderScript)()  -- Execute the URL decoder script
 
-print("Decoded URL:", decodedUrl)  -- Debugging: Check the decoded URL
+-- Don't print the decoded URL to console
+-- print("Decoded URL:", decodedUrl)  -- Commented out to avoid showing the URL in the console
 
 -- Check if the decoded URL is valid and not empty
 if decodedUrl and decodedUrl ~= "" then
