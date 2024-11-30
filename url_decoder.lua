@@ -3,7 +3,7 @@ local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVm
 
 local function decodeBase64(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
+    data = string.gsub(data, '[^' .. b .. '=]', '')
     return (data:gsub('.', function(x)
         if x == '=' then return '' end
         local r, f = '', (b:find(x) - 1)
@@ -21,16 +21,6 @@ local function decodeBase64(data)
     end))
 end
 
--- Decode the script URL
+-- Decode the script URL and print it
 local decodedUrl = decodeBase64(encodedUrl)
-
--- Debugging: Print the decoded URL
 print("Decoded URL:", decodedUrl)
-
--- Ensure the decoded URL is valid and correctly formatted
-if decodedUrl and decodedUrl:match("^https://") then
-    return decodedUrl
-else
-    warn("Invalid or malformed decoded URL!")
-    return nil
-end
