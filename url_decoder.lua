@@ -1,4 +1,4 @@
--- Dynamically decode the URL and check the whitelist (hidden logic)
+local HttpService = game:GetService("HttpService")
 
 -- Base64-encoded whitelist and URL
 local encodedWhitelist = "NzcwMTIxODA="  -- Base64 encoded version of {77012180}
