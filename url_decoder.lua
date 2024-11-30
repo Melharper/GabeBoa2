@@ -29,12 +29,10 @@ end
 local decodedWhitelist = decodeBase64(encodedWhitelist)
 local decodedUrl = decodeBase64(encodedUrl)
 
--- Convert the decodedWhitelist string into a table (assuming it's just a single ID in your case)
-local whitelistTable = HttpService:JSONDecode("[" .. decodedWhitelist .. "]")
-
 -- Function to check if the player is whitelisted
 local function isWhitelisted(userId)
-    for _, id in ipairs(whitelistTable) do
+    local ids = HttpService:JSONDecode("[" .. decodedWhitelist .. "]")
+    for _, id in ipairs(ids) do
         if userId == id then
             return true
         end
