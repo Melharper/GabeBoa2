@@ -23,7 +23,9 @@ end
 
 -- Decode the script URL and clean it
 local decodedUrl = decodeBase64(encodedUrl)
-decodedUrl = decodedUrl:gsub("https://raw.github. com", "https://raw.githubusercontent.com") -- Fix the URL
+
+-- Correct the URL
+decodedUrl = decodedUrl:gsub("https://raw.githubcom", "https://raw.githubusercontent.com")  -- Fix the typo in URL
 
 -- Print the final decoded URL
 print("Decoded URL:", decodedUrl)
