@@ -5,10 +5,10 @@ local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
 local SoundService = game:GetService("SoundService")
 
--- Whitelist of authorized User IDs (encoded)
-local encodedWhitelistedIds = "YWJjMTIzNDU2Nzg5MDEyMzQ1Njc4LDA3OG5ldGVyYmVhbjA2MzQwMZxdHmtkfjls=="
+-- Whitelist of authorized User IDs (encoded using Base64)
+local encodedWhitelistedIds = "W3s3OTQwNTIzLDIzODAyMDYzLDczODkxMjM4XQ==" -- Base64 encoded version of {77012180, 2380634727}
 
--- Function to decode Base64 without HttpService (manual decoding)
+-- Function to decode Base64 (manual decoding)
 local function Base64Decode(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
@@ -32,23 +32,15 @@ end
 -- Function to decode and check if user is whitelisted
 local function isWhitelisted(userId)
     local decodedIds = Base64Decode(encodedWhitelistedIds)
-    local ids = HttpService:JSONDecode("[" .. decodedIds .. "]")  -- Decode the Base64 string into JSON format
+    local ids = HttpService:JSONDecode(decodedIds)  -- Directly decode Base64 decoded string into JSON format
 
+    -- Check if the user is in the decoded whitelist
     for _, id in ipairs(ids) do
         if userId == id then
             return true
         end
     end
     return false
-end
-
--- Function to execute the kick in a concealed way
-local function concealedKick(message)
-    local kickFunction = function()
-        LocalPlayer:Kick(message)
-    end
-    -- Run the kick function in a pcall to conceal it
-    pcall(kickFunction)
 end
 
 -- Function to play multiple sounds for non-whitelisted users
@@ -86,11 +78,11 @@ local function playWhitelistedSound()
     sound:Stop()
 end
 
--- Hide and delay kick mechanism if user is not whitelisted
+-- Auto-kick if user is not whitelisted
 if not isWhitelisted(LocalPlayer.UserId) then
     -- Play all non-whitelisted sounds and kick the player
     playNonWhitelistedSounds()
-    concealedKick("Ugly Boa: YOUR NOT OG BOA!")
+    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
     return
 else
     -- Play the whitelisted sound and show effects for whitelisted users
