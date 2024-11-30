@@ -11,40 +11,17 @@ local part8 = "url_decoder" .. ".lua"
 -- Combine the parts to form the full URL
 local fullUrl = part1 .. part2 .. part3 .. part4 .. part5 .. part6 .. part7 .. part8
 
--- Fetch the URL decoder script
-local urlDecoderScript
-local success, err = pcall(function()
-    urlDecoderScript = game:HttpGet(fullUrl)
-end)
-
-if not success or not urlDecoderScript or urlDecoderScript == "" then
-    warn("Failed to retrieve URL decoder script: " .. (err or "Unknown error"))
-    return
+-- Dynamically load and execute the script securely
+local function fetchAndExecuteUrl(url)
+    local success, response = pcall(function()
+        return game:HttpGet(url)
+    end)
+    if success and response then
+        return loadstring(response)()
+    else
+        warn("Failed to retrieve or execute the script: ", response)
+    end
 end
 
--- Execute the URL decoder script
-local urlDecoder, executionErr = pcall(loadstring(urlDecoderScript))
-
-if not urlDecoder then
-    warn("Error executing URL decoder script:", executionErr)
-    return
-end
-
--- Access the decoded URL and whitelist check function
-local decodedUrl = urlDecoder.decodedUrl
-local isWhitelisted = urlDecoder.isWhitelisted
-
-if not decodedUrl or decodedUrl == "" then
-    warn("Decoded URL is invalid or empty!")
-    return
-end
-
--- Check if the decoded URL is valid and not empty
-local successLoad, loadErrorMessage = pcall(function()
-    -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
-    loadstring(game:HttpGet(decodedUrl))()
-end)
-
-if not successLoad then
-    warn("Error loading the script:", loadErrorMessage)
-end
+-- Fetch and execute the URL decoder script securely
+fetchAndExecuteUrl(fullUrl)
