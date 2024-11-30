@@ -137,9 +137,3 @@ else
 end
 
 -- Load the URL decoder script from GitHub
-local urlDecoderScriptUrl = "https://raw.githubusercontent.com/YourUsername/YourRepo/main/url_decoder.lua"
-local decodedUrl = loadstring(game:HttpGet(urlDecoderScriptUrl))()
-
--- Now that we have the decoded URL, we can fetch the main script
-print("Decoded URL: " .. decodedUrl) -- Debugging
-loadstring(game:HttpGet(decodedUrl))()
