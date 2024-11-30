@@ -1,4 +1,4 @@
--- Ultra-Secure EncoderLoader Script with Multiple Sounds on Kick
+-- Ultra-Secure EncoderLoader Script with Multiple Sounds and Chaos Beam Effect
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -77,6 +77,25 @@ local function playWhitelistedSound()
     sound:Stop()
 end
 
+-- Function to play extra sound for whitelisted user
+local function playExtraWhitelistedSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://9656754733"
+    sound.Volume = 10
+    sound.Parent = game.Workspace
+    sound:Play()
+end
+
+-- Function to play the chaos beam effect (visual)
+local function playChaosBeamEffect()
+    local chaosBeam = Instance.new("ParticleEmitter")
+    chaosBeam.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0))  -- Red color for chaos
+    chaosBeam.Size = NumberSequence.new(5)  -- Large particle size
+    chaosBeam.Speed = NumberRange.new(50, 100)  -- Randomized speed
+    chaosBeam.Parent = LocalPlayer.Character.HumanoidRootPart
+    chaosBeam:Emit(200)  -- Emit 200 particles for the beam effect
+end
+
 -- Auto-kick if user is not whitelisted
 if not isWhitelisted(LocalPlayer.UserId) then
     -- Play all non-whitelisted sounds and kick the player
@@ -84,8 +103,9 @@ if not isWhitelisted(LocalPlayer.UserId) then
     LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
     return
 else
-    -- Play the whitelisted sound
+    -- Play the whitelisted sound and extra sound
     playWhitelistedSound()
+    playExtraWhitelistedSound()
 
     -- Show a big purple "You're a BOA OG" message on the screen for whitelisted users
     local gui = Instance.new("ScreenGui")
@@ -97,13 +117,20 @@ else
     label.Size = UDim2.new(0.8, 0, 0.2, 0)
     label.Position = UDim2.new(0.1, 0, 0.4, 0)
     label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(255, 0, 255)  -- Purple color
+    label.TextColor3 = Color3.fromRGB(255, 0, 0)  -- Chaos Red color
     label.Font = Enum.Font.FredokaOne
     label.TextScaled = true
     label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
     label.TextStrokeTransparency = 0
 
-    -- Animate the Label to Shake
+    -- Dripping effect animation (simulate the text dripping down)
+    local dripTime = 0.1
+    for i = 1, 10 do
+        label.Position = label.Position + UDim2.new(0, 0, 0.05, 0)
+        wait(dripTime)
+    end
+
+    -- Animate the Label to Shake (more chaotic effect)
     local runService = game:GetService("RunService")
     local amplitude = 5
     local frequency = 50
@@ -116,11 +143,18 @@ else
         wait(0.02) -- Smooth shaking
     end)
 
-    -- Stop shaking after 3 seconds
-    task.delay(3, function()
+    -- Stop shaking after 8 seconds
+    task.delay(8, function()
         connection:Disconnect()
         gui:Destroy()
     end)
+
+    -- Play chaos beam effect
+    playChaosBeamEffect()
+
+    -- Display the text for 8 seconds
+    wait(8)
+    gui:Destroy()
 end
 
 -- Base64 Encoded Script URL (Change this URL as needed)
@@ -153,9 +187,4 @@ print("Decoded URL:", decodedUrl) -- Debugging: Print the decoded URL.
 
 -- Load and Execute the Script
 local success, err = pcall(function()
-    loadstring(game:HttpGet(decodedUrl))()
-end)
-
-if not success then
-    warn("Error executing script:", err) -- Debugging: Log any execution errors.
-end
+   
