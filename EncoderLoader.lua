@@ -1,4 +1,4 @@
--- Ultra-Secure EncoderLoader Script with GUI Effects for Whitelisted Users
+-- Ultra-Secure EncoderLoader Script with Multiple Sounds on Kick
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -8,7 +8,7 @@ local SoundService = game:GetService("SoundService")
 -- Whitelist of authorized User IDs (obfuscated using Base64)
 local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw==" -- Base64 encoded version of {77012180, 2380634727}
 
--- Function to decode Base64
+-- Function to decode Base64 without HttpService (manual decoding)
 local function Base64Decode(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
@@ -42,7 +42,7 @@ local function isWhitelisted(userId)
     return false
 end
 
--- Function to play non-whitelisted sounds
+-- Function to play multiple sounds for non-whitelisted users
 local function playNonWhitelistedSounds()
     local soundIds = {
         "rbxassetid://129478511877457", -- Original non-whitelisted sound
@@ -77,27 +77,17 @@ local function playWhitelistedSound()
     sound:Stop()
 end
 
--- Function to play the chaos beam effect (visual) in the GUI
-local function playChaosBeamEffect()
-    local beam = Instance.new("Frame")
-    beam.Size = UDim2.new(1, 0, 0, 10)
-    beam.Position = UDim2.new(0, 0, 0.5, 0) -- Centered horizontally
-    beam.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Red color for chaos
-    beam.Parent = StarterGui
+-- Auto-kick if user is not whitelisted
+if not isWhitelisted(LocalPlayer.UserId) then
+    -- Play all non-whitelisted sounds and kick the player
+    playNonWhitelistedSounds()
+    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
+    return
+else
+    -- Play the whitelisted sound
+    playWhitelistedSound()
 
-    -- Animate the beam
-    for i = 1, 20 do
-        beam.Position = UDim2.new(0, math.random(-100, 100), 0.5, 0)
-        wait(0.1)
-    end
-
-    -- Remove the beam after 5 seconds
-    wait(5)
-    beam:Destroy()
-end
-
--- Function to play the blood dripping text effect
-local function playDrippingBloodEffect()
+    -- Show a big purple "You're a BOA OG" message on the screen for whitelisted users
     local gui = Instance.new("ScreenGui")
     gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
@@ -107,18 +97,11 @@ local function playDrippingBloodEffect()
     label.Size = UDim2.new(0.8, 0, 0.2, 0)
     label.Position = UDim2.new(0.1, 0, 0.4, 0)
     label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(255, 0, 0)  -- Chaos Red color
+    label.TextColor3 = Color3.fromRGB(255, 0, 255)  -- Purple color
     label.Font = Enum.Font.FredokaOne
     label.TextScaled = true
     label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
     label.TextStrokeTransparency = 0
-
-    -- Simulate the blood drip effect by moving the text down slowly
-    local dripTime = 0.1
-    for i = 1, 10 do
-        label.Position = label.Position + UDim2.new(0, 0, 0.05, 0)
-        wait(dripTime)
-    end
 
     -- Animate the Label to Shake
     local runService = game:GetService("RunService")
@@ -133,30 +116,11 @@ local function playDrippingBloodEffect()
         wait(0.02) -- Smooth shaking
     end)
 
-    -- Stop shaking after 8 seconds
-    task.delay(8, function()
+    -- Stop shaking after 3 seconds
+    task.delay(3, function()
         connection:Disconnect()
         gui:Destroy()
     end)
-
-    -- Display the text for 8 seconds
-    wait(8)
-    gui:Destroy()
-end
-
--- Auto-kick if user is not whitelisted
-if not isWhitelisted(LocalPlayer.UserId) then
-    -- Play all non-whitelisted sounds and kick the player
-    playNonWhitelistedSounds()
-    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
-    return
-else
-    -- Play the whitelisted sound and extra sound
-    playWhitelistedSound()
-    playChaosBeamEffect()
-
-    -- Show the "dripping blood" effect and make the text "chaos red"
-    playDrippingBloodEffect()
 end
 
 -- Base64 Encoded Script URL (Change this URL as needed)
@@ -171,3 +135,27 @@ local function decodeBase64(data)
         local r, f = '', (b:find(x) - 1)
         for i = 6, 1, -1 do
             r = r .. (f % 2 ^ i - f % 2 ^ (i - 1) > 0 and '1' or '0')
+        end
+        return r
+    end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
+        if #x ~= 8 then return '' end
+        local c = 0
+        for i = 1, 8 do
+            c = c + (x:sub(i, i) == '1' and 2 ^ (8 - i) or 0)
+        end
+        return string.char(c)
+    end))
+end
+
+-- Decode the Script URL
+local decodedUrl = decodeBase64(encodedUrl)
+print("Decoded URL:", decodedUrl) -- Debugging: Print the decoded URL.
+
+-- Load and Execute the Script
+local success, err = pcall(function()
+    loadstring(game:HttpGet(decodedUrl))()
+end)
+
+if not success then
+    warn("Error executing script:", err) -- Debugging: Log any execution errors.
+end
