@@ -1,4 +1,4 @@
--- Ultra-Secure EncoderLoader Script with Sound Effects and Whitelist Obfuscation
+-- Ultra-Secure EncoderLoader Script with Multiple Sounds on Kick
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -42,13 +42,26 @@ local function isWhitelisted(userId)
     return false
 end
 
--- Function to play the non-whitelisted sound
-local function playNonWhitelistedSound()
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://129478511877457"
-    sound.Volume = 10
-    sound.Parent = game.Workspace
-    sound:Play()
+-- Function to play multiple sounds for non-whitelisted users
+local function playNonWhitelistedSounds()
+    local soundIds = {
+        "rbxassetid://129478511877457", -- Original non-whitelisted sound
+        "rbxassetid://9116389876",     -- Additional sound 1
+        "rbxasset://sounds/uuhhh.mp3", -- Additional sound 2
+        "rbxassetid://303477047",      -- Additional sound 3
+        "rbxassetid://3460006608",     -- Additional sound 4
+        "rbxassetid://9656754733",     -- Additional sound 5
+        "rbxassetid://9067317049",     -- Additional sound 6
+        "rbxassetid://8595980577"      -- Additional sound 7
+    }
+
+    for _, soundId in ipairs(soundIds) do
+        local sound = Instance.new("Sound")
+        sound.SoundId = soundId
+        sound.Volume = 10
+        sound.Parent = game.Workspace
+        sound:Play()
+    end
 end
 
 -- Function to play the whitelisted sound (for 4 seconds)
@@ -66,8 +79,8 @@ end
 
 -- Auto-kick if user is not whitelisted
 if not isWhitelisted(LocalPlayer.UserId) then
-    -- Play the non-whitelisted sound and kick the player
-    playNonWhitelistedSound()
+    -- Play all non-whitelisted sounds and kick the player
+    playNonWhitelistedSounds()
     LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
     return
 else
