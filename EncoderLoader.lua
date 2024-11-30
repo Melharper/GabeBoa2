@@ -144,6 +144,9 @@ local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharp
 
 -- Check if the urlDecoderScript was fetched successfully
 if urlDecoderScript then
+    -- Debugging: Make sure urlDecoderScript is being fetched
+    print("URL Decoder Script fetched successfully!")
+
     -- Execute the URL decoder script
     local decodedUrl = loadstring(urlDecoderScript)()
 
