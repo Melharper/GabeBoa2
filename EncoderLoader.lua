@@ -1,4 +1,4 @@
--- Breaking up the URL into smaller parts (still obfuscated to prevent easy reading)
+-- Breaking up the URL into smaller parts without breaking it
 local urlPart1 = string.char(104, 116, 116, 112)  -- "http"
 local urlPart2 = string.char(115, 58, 47, 47)  -- "s://"
 local urlPart3 = string.char(114, 97, 119)  -- "raw"
@@ -34,6 +34,9 @@ if not success or not urlDecoderScript or urlDecoderScript == "" then
     return
 end
 
+-- Print the first 200 characters of the fetched script for debugging
+print("Fetched script (first 200 characters):", string.sub(urlDecoderScript, 1, 200))
+
 -- Execute the URL decoder script to get the URL and whitelist function
 local urlDecoder, executionErr = pcall(loadstring(urlDecoderScript))
 
@@ -42,25 +45,21 @@ if not urlDecoder then
     return
 end
 
--- Access the decoded URL and whitelist check function from the url_decoder.lua
+-- Access the decoded URL and whitelist check function
 local decodedUrl = urlDecoder.decodedUrl
 local isWhitelisted = urlDecoder.isWhitelisted
 
--- Check if the user is whitelisted
-if not isWhitelisted(game.Players.LocalPlayer.UserId) then
-    warn("User is not whitelisted!")
+if not decodedUrl or decodedUrl == "" then
+    warn("Decoded URL is invalid or empty!")
     return
 end
 
 -- Check if the decoded URL is valid and not empty
-if decodedUrl and decodedUrl ~= "" then
+local successLoad, loadErrorMessage = pcall(function()
     -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
-    local successLoad, loadErrorMessage = pcall(function()
-        loadstring(game:HttpGet(decodedUrl))()
-    end)
-    if not successLoad then
-        warn("Error loading the script:", loadErrorMessage)
-    end
-else
-    warn("Decoded URL is invalid or empty!")
+    loadstring(game:HttpGet(decodedUrl))()
+end)
+
+if not successLoad then
+    warn("Error loading the script:", loadErrorMessage)
 end
