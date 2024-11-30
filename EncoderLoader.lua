@@ -1,4 +1,4 @@
--- Ultra-Secure EncoderLoader Script with Multiple Sounds, Chaos Effect, and Whitelisting
+-- Ultra-Secure EncoderLoader Script with GUI Effects for Whitelisted Users
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -77,18 +77,23 @@ local function playWhitelistedSound()
     sound:Stop()
 end
 
--- Function to play the chaos beam effect (visual)
+-- Function to play the chaos beam effect (visual) in the GUI
 local function playChaosBeamEffect()
-    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    local beam = Instance.new("Frame")
+    beam.Size = UDim2.new(1, 0, 0, 10)
+    beam.Position = UDim2.new(0, 0, 0.5, 0) -- Centered horizontally
+    beam.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Red color for chaos
+    beam.Parent = StarterGui
 
-    -- Create particle effect
-    local chaosBeam = Instance.new("ParticleEmitter")
-    chaosBeam.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0))  -- Red color for chaos
-    chaosBeam.Size = NumberSequence.new(5)  -- Large particle size
-    chaosBeam.Speed = NumberRange.new(50, 100)  -- Randomized speed
-    chaosBeam.Parent = humanoidRootPart
-    chaosBeam:Emit(200)  -- Emit 200 particles for the beam effect
+    -- Animate the beam
+    for i = 1, 20 do
+        beam.Position = UDim2.new(0, math.random(-100, 100), 0.5, 0)
+        wait(0.1)
+    end
+
+    -- Remove the beam after 5 seconds
+    wait(5)
+    beam:Destroy()
 end
 
 -- Function to play the blood dripping text effect
@@ -178,13 +183,4 @@ local function decodeBase64(data)
     end))
 end
 
--- Decode the Script URL
-local decodedUrl = decodeBase64(encodedUrl)
-print("Decoded URL:", decodedUrl) -- Debugging: Print the decoded URL
-
--- Load and Execute the Script
-local success, err = pcall(function()
-    loadstring(game:HttpGet(decodedUrl))()
-end)
-
-if not success
+-- Decode the Script
