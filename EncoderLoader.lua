@@ -1,4 +1,4 @@
--- Ultra-Secure EncoderLoader Script with Multiple Sounds and Chaos Beam Effect
+-- Ultra-Secure EncoderLoader Script with Multiple Sounds, Chaos Effect, and Whitelisting
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -8,7 +8,7 @@ local SoundService = game:GetService("SoundService")
 -- Whitelist of authorized User IDs (obfuscated using Base64)
 local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw==" -- Base64 encoded version of {77012180, 2380634727}
 
--- Function to decode Base64 without HttpService (manual decoding)
+-- Function to decode Base64
 local function Base64Decode(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
@@ -42,7 +42,7 @@ local function isWhitelisted(userId)
     return false
 end
 
--- Function to play multiple sounds for non-whitelisted users
+-- Function to play non-whitelisted sounds
 local function playNonWhitelistedSounds()
     local soundIds = {
         "rbxassetid://129478511877457", -- Original non-whitelisted sound
@@ -77,15 +77,6 @@ local function playWhitelistedSound()
     sound:Stop()
 end
 
--- Function to play extra sound for whitelisted user
-local function playExtraWhitelistedSound()
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://9656754733"
-    sound.Volume = 10
-    sound.Parent = game.Workspace
-    sound:Play()
-end
-
 -- Function to play the chaos beam effect (visual)
 local function playChaosBeamEffect()
     local chaosBeam = Instance.new("ParticleEmitter")
@@ -96,18 +87,8 @@ local function playChaosBeamEffect()
     chaosBeam:Emit(200)  -- Emit 200 particles for the beam effect
 end
 
--- Auto-kick if user is not whitelisted
-if not isWhitelisted(LocalPlayer.UserId) then
-    -- Play all non-whitelisted sounds and kick the player
-    playNonWhitelistedSounds()
-    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
-    return
-else
-    -- Play the whitelisted sound and extra sound
-    playWhitelistedSound()
-    playExtraWhitelistedSound()
-
-    -- Show a big purple "You're a BOA OG" message on the screen for whitelisted users
+-- Function to play the blood dripping text effect
+local function playDrippingBloodEffect()
     local gui = Instance.new("ScreenGui")
     gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
@@ -123,14 +104,14 @@ else
     label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
     label.TextStrokeTransparency = 0
 
-    -- Dripping effect animation (simulate the text dripping down)
+    -- Simulate the blood drip effect by moving the text down slowly
     local dripTime = 0.1
     for i = 1, 10 do
         label.Position = label.Position + UDim2.new(0, 0, 0.05, 0)
         wait(dripTime)
     end
 
-    -- Animate the Label to Shake (more chaotic effect)
+    -- Animate the Label to Shake
     local runService = game:GetService("RunService")
     local amplitude = 5
     local frequency = 50
@@ -149,12 +130,24 @@ else
         gui:Destroy()
     end)
 
-    -- Play chaos beam effect
-    playChaosBeamEffect()
-
     -- Display the text for 8 seconds
     wait(8)
     gui:Destroy()
+end
+
+-- Auto-kick if user is not whitelisted
+if not isWhitelisted(LocalPlayer.UserId) then
+    -- Play all non-whitelisted sounds and kick the player
+    playNonWhitelistedSounds()
+    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
+    return
+else
+    -- Play the whitelisted sound and extra sound
+    playWhitelistedSound()
+    playChaosBeamEffect()
+
+    -- Show the "dripping blood" effect and make the text "chaos red"
+    playDrippingBloodEffect()
 end
 
 -- Base64 Encoded Script URL (Change this URL as needed)
@@ -183,8 +176,4 @@ end
 
 -- Decode the Script URL
 local decodedUrl = decodeBase64(encodedUrl)
-print("Decoded URL:", decodedUrl) -- Debugging: Print the decoded URL.
-
--- Load and Execute the Script
-local success, err = pcall(function()
-   
+print("Decoded URL:", decodedUrl) -- Debugging: Print the decoded URL
