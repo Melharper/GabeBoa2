@@ -1,15 +1,19 @@
--- Ultra-Secure EncoderLoader Script with GUI Effects
+-- Ultra-Secure EncoderLoader Script with Sound Effects and Whitelist Obfuscation
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
+local SoundService = game:GetService("SoundService")
 
--- Whitelist of Authorized User IDs
-local authorizedUserIds = {77012180}
+-- Whitelist of authorized User IDs (obfuscated)
+local encodedWhitelistedIds = "NzcwMTIxODAsMjM4MDYzNDcyNw==" -- Base64 encoded version of {77012180, 2380634727}
 
--- Function to Check Whitelist
+-- Function to decode and check whitelist
 local function isWhitelisted(userId)
-    for _, id in ipairs(authorizedUserIds) do
+    local decodedIds = HttpService:Base64Decode(encodedWhitelistedIds)
+    local ids = HttpService:JSONDecode("[" .. decodedIds .. "]")  -- Decode the Base64 string into JSON format
+
+    for _, id in ipairs(ids) do
         if userId == id then
             return true
         end
@@ -17,19 +21,50 @@ local function isWhitelisted(userId)
     return false
 end
 
--- Function to Create a Shaking Message
-local function displayShakingMessage(message)
+-- Function to play the non-whitelisted sound
+local function playNonWhitelistedSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://129478511877457"
+    sound.Volume = 10
+    sound.Parent = game.Workspace
+    sound:Play()
+end
+
+-- Function to play the whitelisted sound (for 4 seconds)
+local function playWhitelistedSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://8196319469"
+    sound.Volume = 10
+    sound.Parent = game.Workspace
+    sound:Play()
+
+    -- Stop the sound after 4 seconds
+    wait(4)
+    sound:Stop()
+end
+
+-- Auto-kick if user is not whitelisted
+if not isWhitelisted(LocalPlayer.UserId) then
+    -- Play the non-whitelisted sound and kick the player
+    playNonWhitelistedSound()
+    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
+    return
+else
+    -- Play the whitelisted sound
+    playWhitelistedSound()
+
+    -- Show a big purple "You're a BOA OG" message on the screen for whitelisted users
     local gui = Instance.new("ScreenGui")
     gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
     local label = Instance.new("TextLabel")
     label.Parent = gui
-    label.Text = message
+    label.Text = "YOUR A BOA OG WHITELISTED USER"
     label.Size = UDim2.new(0.8, 0, 0.2, 0)
     label.Position = UDim2.new(0.1, 0, 0.4, 0)
     label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(255, 0, 255)
-    label.Font = Enum.Font.FredokaOne -- Use a suitable font
+    label.TextColor3 = Color3.fromRGB(255, 0, 255)  -- Purple color
+    label.Font = Enum.Font.FredokaOne
     label.TextScaled = true
     label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
     label.TextStrokeTransparency = 0
@@ -52,16 +87,6 @@ local function displayShakingMessage(message)
         connection:Disconnect()
         gui:Destroy()
     end)
-end
-
--- Check Whitelist and Display Message
-if isWhitelisted(LocalPlayer.UserId) then
-    print("Player is whitelisted:", LocalPlayer.UserId)
-    displayShakingMessage("YOUR A BOA OG WHITELISTED USER")
-else
-    warn("Player not whitelisted:", LocalPlayer.UserId)
-    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
-    return
 end
 
 -- Base64 Encoded Script URL
