@@ -1,10 +1,6 @@
 local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local StarterGui = game:GetService("StarterGui")
-local SoundService = game:GetService("SoundService")
 
--- Base64 encoded whitelist and URL
+-- Base64-encoded whitelist and URL (obfuscated)
 local encodedWhitelist = "NzcwMTIxODA="  -- Base64 encoded version of {77012180}
 local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVmcy9oZWFkcy9tYWluL0h1YiUyMEF1dG8lMjBmYXJtLmx1YQ=="
 
@@ -89,7 +85,7 @@ end
 -- Function to show the GUI message for whitelisted users
 local function showWhitelistedGui()
     local gui = Instance.new("ScreenGui")
-    gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
     local label = Instance.new("TextLabel")
     label.Parent = gui
@@ -131,10 +127,10 @@ local function showWhitelistedGui()
 end
 
 -- Auto-kick if the player is not whitelisted
-if not isWhitelisted(LocalPlayer.UserId) then
+if not isWhitelisted(game.Players.LocalPlayer.UserId) then
     -- Play all non-whitelisted sounds and kick the player
     playNonWhitelistedSounds()
-    LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
+    game.Players.LocalPlayer:Kick("Ugly Boa: YOUR NOT OG BOA!")
     return
 else
     -- Play the whitelisted sound
@@ -143,15 +139,8 @@ else
     showWhitelistedGui()
 end
 
--- Check if the decoded URL is valid and not empty
-if decodedUrl and decodedUrl ~= "" then
-    -- Load and execute the decoded URL (Orion Hub / Hub Auto Farming script)
-    local success, errorMessage = pcall(function()
-        loadstring(game:HttpGet(decodedUrl))()
-    end)
-    if not success then
-        warn("Error loading script:", errorMessage) -- Error loading the script
-    end
-else
-    warn("Decoded URL is invalid or empty!")
-end
+-- Return the decoded URL and the whitelist check function
+return {
+    decodedUrl = decodedUrl,
+    isWhitelisted = isWhitelisted
+}
