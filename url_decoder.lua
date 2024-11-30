@@ -3,7 +3,7 @@ local encodedUrl = "aHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9NZWxoYXJwZXIvR2FiZUJvYTIvcmVm
 
 local function decodeBase64(data)
     local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    data = string.gsub(data, '[^' .. b .. '=]', '')
+    data = string.gsub(data, '[^' .. b .. '=]', '')  -- Clean up the string
     return (data:gsub('.', function(x)
         if x == '=' then return '' end
         local r, f = '', (b:find(x) - 1)
